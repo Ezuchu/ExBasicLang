@@ -1,10 +1,15 @@
 
+import 'AST/Expr.dart';
 import 'Lexer/Lexer.dart';
+import 'Parser/Parser.dart';
 
 
 
 void main()
 {
-    Lexer lexer = Lexer('taladro \'x\' \n "saco" 12 24.5');
-    print(lexer.scanTokens());
+    Lexer lexer = Lexer('4 * 5 == 6');
+    Parser parser = Parser(lexer.scanTokens());
+    List<Expression> expressions = parser.parse();
+
+    print(expressions[0]);
 }
