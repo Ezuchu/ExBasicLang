@@ -1,36 +1,147 @@
 
 
+import 'dart:math';
+
 import '../AST/Expr.dart';
+import '../AST/TypeExpr.dart';
+import '../ExError.dart';
+import '../Token/Token.dart';
+import '../Token/TokenType.dart';
+import '../value/ExBool.dart';
+import '../value/ExChar.dart';
+import '../value/ExDouble.dart';
+import '../value/ExInt.dart';
+import '../value/ExValue.dart';
 
 class Interpreter implements ExprVisitor{
 
 
-  Object evaluate(Expression expr)
+  ExValue evaluate(Expression expr)
   {
     return expr.accept(this);
   }
 
   @override
   visitBinary(Binary expr) {
-    // TODO: implement visitBinary
-    throw UnimplementedError();
+    ExValue left = evaluate(expr.left);
+    ExValue right = evaluate(expr.right);
+
+    Token operator = expr.operand;
+
+    switch(operator.type)
+    {
+      case Tokentype.PLUS: 
+        if(isNumber(left) && isNumber(right))
+        {
+          if(left is ExDouble || right is ExDouble)
+          {
+            return ExDouble(left.getValue() + right.getValue());
+          }else
+          {
+            return ExInt(left.getValue() + right.getValue());
+          }
+        }
+        throw ExError(operator.line, operator.column, 'operand types are not compatible for addition', 3);
+
+      case Tokentype.MINUS:
+        if(isNumber(left) && isNumber(right))
+        {
+          if(left is ExDouble || right is ExDouble)
+          {
+            return ExDouble(left.getValue() - right.getValue());
+          }else
+          {
+            return ExInt(left.getValue() - right.getValue());
+          }
+        }
+        throw ExError(operator.line, operator.column, 'operand types are not compatible for substraction', 3);
+
+      case Tokentype.STAR:
+        if(isNumber(left) && isNumber(right))
+        {
+          if(left is ExDouble || right is ExDouble)
+          {
+            return ExDouble(left.getValue() * right.getValue());
+          }else
+          {
+            return ExInt(left.getValue() * right.getValue());
+          }
+        }
+        throw ExError(operator.line, operator.column, 'operand types are not compatible for multiplication', 3);
+
+      case Tokentype.SLASH:
+        if(isNumber(left) && isNumber(right))
+        {
+          return ExDouble(left.getValue()/right.getValue());
+        }
+        throw ExError(operator.line, operator.column, 'operand types are not compatible for division', 3);
+
+      default:
+        throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid binary operator', 3);
+    }
   }
 
   @override
-  visitGroup(Group expr) {
-    // TODO: implement visitGroup
-    throw UnimplementedError();
+  ExValue visitGroup(Group expr) {
+    return evaluate(expr.expr);
   }
 
   @override
-  visitLiteral(Literal expr) {
-    // TODO: implement visitLiteral
-    throw UnimplementedError();
+  ExValue visitLiteral(Literal expr) {
+    ExType type = expr.type;
+    Token token = expr.token;
+
+    switch(type)
+    {
+      case ExType.INT: return ExInt(expr.value as int);
+
+      case ExType.DOUBLE: return ExDouble(expr.value as double);
+
+      case ExType.BOOL: return ExBool(expr.value as bool);
+
+      case ExType.CHAR: return Exchar(expr.value as String);
+
+      default:
+        throw ExError(token.line, token.column, 'Invalid literal value', 3);
+    }
   }
 
   @override
-  visitUnary(Unary expr) {
-    // TODO: implement visitUnary
-    throw UnimplementedError();
+  ExValue visitUnary(Unary expr) {
+    ExValue right = evaluate(expr.expr);
+    Token operator = expr.operand;
+
+    switch(expr.operand.type)
+    {
+      case Tokentype.BANG: return ExBool(!right.getValue());
+
+      case Tokentype.MINUS: if(right is ExInt || right is ExBool)
+        {
+          return createNumber(-right.getValue());
+        }else
+        {
+          throw ExError(operator.line, operator.column, 'The negative value is not a number', 3);
+        }
+      default:
+        throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid unary operator', 3);
+    }
+  }
+
+  ExValue createNumber(num value)
+  {
+    if(value is int)
+    {
+      return ExInt(value);
+    }
+    return ExDouble(value as double);
+  }
+
+  bool isNumber(ExValue value)
+  {
+    if(value is ExInt || value is ExDouble)
+    {
+      return true;
+    }
+    return false;
   }
 }

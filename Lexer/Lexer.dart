@@ -147,7 +147,7 @@ class Lexer extends LexerBase
     void scanIdentifier()
     {
       String name = "";
-      while(RegExp(r'[a-zñA-ZÑ_0-9]').hasMatch(peek()))
+      while(RegExp(r'[a-zñA-ZÑ_0-9]').hasMatch(peek()) && !isAtEnd())
       {
         name += source[current];
         advance();
