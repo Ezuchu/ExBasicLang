@@ -76,6 +76,29 @@ class Interpreter implements ExprVisitor{
         }
         throw ExError(operator.line, operator.column, 'operand types are not compatible for division', 3);
 
+
+      case Tokentype.EQUAL_EQUAL:
+        return left.isEqual(right);
+
+      case Tokentype.BANG_EQUAL:
+        return ExBool(!left.isEqual(right).getValue());
+
+      case Tokentype.LESS:
+        areNumbers(left,right,operator);
+        return ExBool(left.getValue() < right.getValue());
+      
+      case Tokentype.LESS_EQUAL:
+        areNumbers(left,right,operator);
+        return ExBool(left.getValue() <= right.getValue());
+
+      case Tokentype.GREATER:
+        areNumbers(left,right,operator);
+        return ExBool(left.getValue() > right.getValue());
+
+      case Tokentype.GREATER_EQUAL:
+        areNumbers(left,right,operator);
+        return ExBool(left.getValue() >= right.getValue());
+
       default:
         throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid binary operator', 3);
     }
@@ -143,5 +166,14 @@ class Interpreter implements ExprVisitor{
       return true;
     }
     return false;
+  }
+
+  void areNumbers(ExValue left, ExValue right,Token reference)
+  {
+    
+    if(!isNumber(left) || !isNumber(right))
+    {
+      throw ExError(reference.line, reference.column, 'at least one of the operands is not a number', 3);
+    }
   }
 }

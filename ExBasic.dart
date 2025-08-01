@@ -8,7 +8,7 @@ import 'runtime/interpreter.dart';
 
 void main()
 {
-    Lexer lexer = Lexer('1 / 2.5');
+    Lexer lexer = Lexer('1 > 2');
     Parser parser = Parser(lexer.scanTokens());
     List<Expression> expressions = parser.parse();
     Interpreter interpreter = Interpreter();

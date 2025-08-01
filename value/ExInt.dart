@@ -1,6 +1,7 @@
 
 
 import '../AST/TypeExpr.dart';
+import 'ExBool.dart';
 import 'ExValue.dart';
 
 class ExInt extends ExValue
@@ -20,8 +21,15 @@ class ExInt extends ExValue
   }
 
   @override
+  ExBool isEqual(ExValue value) {
+    return ExBool(this.value == value.getValue());
+  }
+
+  @override
   getValue()
   {
     return value;
   }
+
+
 }

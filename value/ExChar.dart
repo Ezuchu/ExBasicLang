@@ -1,4 +1,5 @@
 import '../AST/TypeExpr.dart';
+import 'ExBool.dart';
 import 'ExValue.dart';
 
 class Exchar extends ExValue
@@ -20,6 +21,11 @@ class Exchar extends ExValue
   ExValue copy()
   {
     return Exchar(value);
+  }
+
+  @override
+  ExBool isEqual(ExValue value) {
+    return ExBool(this.value == value.getValue());
   }
 
   @override

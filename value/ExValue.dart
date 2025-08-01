@@ -1,6 +1,5 @@
-
-
 import '../AST/TypeExpr.dart';
+import 'ExBool.dart';
 
 abstract class ExValue<R>
 {
@@ -12,6 +11,8 @@ abstract class ExValue<R>
   String toString();
 
   ExValue copy();
+
+  ExBool isEqual(ExValue value);
 
   R getValue();
 
