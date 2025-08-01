@@ -1,6 +1,5 @@
 
 import '../ExError.dart';
-import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import 'LexerBase.dart';
 

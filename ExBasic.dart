@@ -8,11 +8,10 @@ import 'runtime/interpreter.dart';
 
 void main()
 {
-    Lexer lexer = Lexer('1 > 2');
+    Lexer lexer = Lexer('print 4+6;');
     Parser parser = Parser(lexer.scanTokens());
-    List<Expression> expressions = parser.parse();
     Interpreter interpreter = Interpreter();
 
-    print(interpreter.evaluate(expressions[0]));
+    interpreter.interprete(parser.parse());
     
 }

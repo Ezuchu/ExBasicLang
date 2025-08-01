@@ -1,7 +1,5 @@
-
-import 'dart:math';
-
 import '../AST/Expr.dart';
+import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../ExError.dart';
 import '../Token/Token.dart';
@@ -11,6 +9,31 @@ import 'ParserBase.dart';
 class Parser extends ParserBase
 {
   Parser(super.tokens);
+
+
+  Statement statement()
+  {
+    Token act = tokens[current];
+    switch(act.type)
+    {
+      case Tokentype.PRINT: return printStmt();
+
+      default:
+        throw ExError(act.line, act.column, 'unknown statement', 2);
+    }
+  }
+
+  Statement printStmt()
+  {
+    match([Tokentype.PRINT]);
+    Token reference = previous();
+
+    Expression expr = expression();
+
+    consume(Tokentype.SEMICOLON, "Expect ';' after sentence");
+
+    return Print(expr, reference);
+  }
 
   Expression expression()
   {

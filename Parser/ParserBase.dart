@@ -1,7 +1,5 @@
-
-import 'dart:ffi';
-
 import '../AST/Expr.dart';
+import '../AST/Stmt.dart';
 import '../ExError.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
@@ -14,14 +12,17 @@ abstract class ParserBase
 
   ParserBase(this.tokens);
 
-  List<Expression> parse()
+  List<Statement> parse()
   {
+    List<Statement> statements = [];
     while(!isAtEnd())
     {
-      expressions.add(expression());
+      statements.add(statement());
     }
-    return expressions;
+    return statements;
   }
+
+  statement();
 
   Expression expression();
   Expression equality();

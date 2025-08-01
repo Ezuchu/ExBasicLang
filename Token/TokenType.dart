@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 enum Tokentype 
 {
     LEFT_BRACE,
@@ -45,6 +43,8 @@ enum Tokentype
     INT_TYPE,
     DOUBLE_TYPE,
     BOOLEAN_TYPE,
+
+    PRINT,
     
 
     EOF,
@@ -61,5 +61,7 @@ Map<String, Tokentype> typeMap={
   "char":Tokentype.CHAR_TYPE,
   "int":Tokentype.INT_TYPE,
   "double":Tokentype.DOUBLE_TYPE,
-  "bool":Tokentype.BOOLEAN_TYPE
+  "bool":Tokentype.BOOLEAN_TYPE,
+
+  "print":Tokentype.PRINT
 };

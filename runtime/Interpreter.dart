@@ -1,8 +1,5 @@
-
-
-import 'dart:math';
-
 import '../AST/Expr.dart';
+import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../ExError.dart';
 import '../Token/Token.dart';
@@ -13,12 +10,32 @@ import '../value/ExDouble.dart';
 import '../value/ExInt.dart';
 import '../value/ExValue.dart';
 
-class Interpreter implements ExprVisitor{
+class Interpreter implements ExprVisitor,StmtVisitor{
 
+
+  void interprete(List<Statement> statements)
+  {
+    for(Statement stmt in statements)
+    {
+      execute(stmt);
+    }
+  }
+
+  void execute(Statement stmt)
+  {
+    stmt.accept(this);
+  }
 
   ExValue evaluate(Expression expr)
   {
     return expr.accept(this);
+  }
+
+  @override
+  visitPrint(Print stmt) {
+    ExValue value = evaluate(stmt.expr);
+
+    print(value);
   }
 
   @override
@@ -176,4 +193,6 @@ class Interpreter implements ExprVisitor{
       throw ExError(reference.line, reference.column, 'at least one of the operands is not a number', 3);
     }
   }
+  
+  
 }
