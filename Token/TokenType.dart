@@ -52,6 +52,13 @@ enum Tokentype
 
 }
 
+List<Tokentype> types = [
+  Tokentype.INT_TYPE,
+  Tokentype.DOUBLE_TYPE,
+  Tokentype.BOOLEAN_TYPE,
+  Tokentype.CHAR_TYPE,
+  Tokentype.IDENTIFIER];
+
 Map<String, Tokentype> typeMap={
 
   "TRUE": Tokentype.TRUE,

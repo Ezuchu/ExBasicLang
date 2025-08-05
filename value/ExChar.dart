@@ -2,11 +2,11 @@ import '../AST/TypeExpr.dart';
 import 'ExBool.dart';
 import 'ExValue.dart';
 
-class Exchar extends ExValue
+class ExChar extends ExValue
 {
   String? value;
 
-  Exchar(String? value) : super(ExType.CHAR)
+  ExChar(String? value) : super(ExType.CHAR)
   {
     this.value = value;
   }
@@ -20,7 +20,7 @@ class Exchar extends ExValue
   @override
   ExValue copy()
   {
-    return Exchar(value);
+    return ExChar(value);
   }
 
   @override

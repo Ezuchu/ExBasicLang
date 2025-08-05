@@ -9,8 +9,11 @@ import '../value/ExChar.dart';
 import '../value/ExDouble.dart';
 import '../value/ExInt.dart';
 import '../value/ExValue.dart';
+import 'enviroment.dart';
 
 class Interpreter implements ExprVisitor,StmtVisitor{
+
+  Enviroment enviroment = Enviroment();
 
 
   void interprete(List<Statement> statements)
@@ -31,11 +34,28 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return expr.accept(this);
   }
 
+  @override  
+  visitExpressionStmt(ExpressionStmt stmt) {
+    ExValue value = evaluate(stmt.expr);
+    print(value);
+  }
+
   @override
   visitPrint(Print stmt) {
     ExValue value = evaluate(stmt.expr);
 
     print(value);
+  }
+
+  @override
+  visitVarDeclaration(VarDeclaration stmt) {
+    Token identifier = stmt.identifier;
+
+    ExValue? value = stmt.initializer == null? null : this.evaluate(stmt.initializer!);
+
+    ExValue initial = defineValue(stmt.identifier,stmt.type,value);
+
+    enviroment.define(identifier, initial);
   }
 
   @override
@@ -139,7 +159,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
       case ExType.BOOL: return ExBool(expr.value as bool);
 
-      case ExType.CHAR: return Exchar(expr.value as String);
+      case ExType.CHAR: return ExChar(expr.value as String);
 
       default:
         throw ExError(token.line, token.column, 'Invalid literal value', 3);
@@ -165,6 +185,44 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       default:
         throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid unary operator', 3);
     }
+  }
+
+  @override
+  ExValue visitVariable(Variable expr)
+  {
+    return enviroment.get(expr.name);
+  }
+
+  ExValue defineValue(Token name, TypeExpr type, ExValue? value)
+  {
+    ExValue initial;
+    if(value != null)
+    {
+      if(type.type != value.type && !(type.type == ExType.DOUBLE && value.type == ExType.INT))
+      {
+        throw ExError(name.line, name.column, 'incompatible types in declaration', 3);
+      }
+      if(type.type == ExType.DOUBLE && value.type == ExType.INT)
+      {
+        initial = ExDouble(value.getValue());
+      }else
+      {
+        initial = value;
+      }
+    }else
+    {
+      switch(type.type)
+      {
+        case ExType.INT : initial = ExInt(null);break;
+        case ExType.DOUBLE : initial = ExDouble(null);break;
+        case ExType.CHAR : initial = ExChar(null);break;
+        case ExType.BOOL : initial = ExBool(null);break;
+        default:
+          return ExInt(5);
+      }
+    }
+    return initial;
+    
   }
 
   ExValue createNumber(num value)

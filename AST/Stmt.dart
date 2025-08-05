@@ -1,5 +1,6 @@
 import '../Token/Token.dart';
 import 'Expr.dart';
+import 'TypeExpr.dart';
 
 abstract class Statement
 {
@@ -9,6 +10,20 @@ abstract class Statement
 abstract class StmtVisitor<R>
 {
   R visitPrint(Print stmt);
+  R visitExpressionStmt(ExpressionStmt stmt);
+  R visitVarDeclaration(VarDeclaration stmt);
+}
+
+class ExpressionStmt extends Statement
+{
+  Expression expr;
+
+  ExpressionStmt(this.expr);
+
+  @override  
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitExpressionStmt(this);
+  }
 }
 
 class Print extends Statement
@@ -22,5 +37,19 @@ class Print extends Statement
   R accept<R>(StmtVisitor visitor)
   {
     return visitor.visitPrint(this);
+  }
+}
+
+class VarDeclaration extends Statement
+{
+  TypeExpr type;
+  Token identifier;
+  Expression? initializer;
+
+  VarDeclaration(this.type,this.identifier,this.initializer);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitVarDeclaration(this);
   }
 }

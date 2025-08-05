@@ -8,7 +8,7 @@ import 'runtime/interpreter.dart';
 
 void main()
 {
-    Lexer lexer = Lexer('print 4+6;');
+    Lexer lexer = Lexer('int caja = 2; print caja;');
     Parser parser = Parser(lexer.scanTokens());
     Interpreter interpreter = Interpreter();
 

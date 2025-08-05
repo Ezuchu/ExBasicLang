@@ -3,7 +3,7 @@ import 'ExValue.dart';
 
 class ExBool extends ExValue
 {
-  bool value;
+  bool? value;
 
   ExBool(this.value):super(ExType.BOOL);
 

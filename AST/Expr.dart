@@ -11,6 +11,7 @@ abstract class ExprVisitor<R>
   R visitBinary(Binary expr);
   R visitGroup(Group expr);
   R visitLiteral(Literal expr);
+  R visitVariable(Variable expr);
   R visitUnary(Unary expr);
 }
 
@@ -66,6 +67,18 @@ class Literal extends Expression
   @override
   String toString() {
     return "$value";
+  }
+}
+
+class Variable extends Expression
+{
+  final Token name;
+
+  Variable(this.name);
+
+  R accept<R>(ExprVisitor visitor)
+  {
+    return visitor.visitVariable(this);
   }
 }
 

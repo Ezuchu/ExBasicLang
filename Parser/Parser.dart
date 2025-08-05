@@ -8,24 +8,43 @@ import 'ParserBase.dart';
 
 class Parser extends ParserBase
 {
+
+
   Parser(super.tokens);
 
+  
 
   Statement statement()
   {
     Token act = tokens[current];
-    switch(act.type)
-    {
-      case Tokentype.PRINT: return printStmt();
+    if(match([Tokentype.PRINT])) return printStmt();
 
-      default:
-        throw ExError(act.line, act.column, 'unknown statement', 2);
+    if(match(types))
+    {
+      if(match([Tokentype.IDENTIFIER]))
+      {
+        current--;
+        return varDeclarationStmt();
+      }else
+      {
+        current--;
+      }
     }
+
+    return expressionStmt();
+  }
+
+  Statement expressionStmt()
+  {
+    Expression expr = expression();
+
+    consume(Tokentype.SEMICOLON, "Expect ';' after sentence");
+
+    return ExpressionStmt(expr);
   }
 
   Statement printStmt()
   {
-    match([Tokentype.PRINT]);
     Token reference = previous();
 
     Expression expr = expression();
@@ -33,6 +52,36 @@ class Parser extends ParserBase
     consume(Tokentype.SEMICOLON, "Expect ';' after sentence");
 
     return Print(expr, reference);
+  }
+
+  Statement varDeclarationStmt()
+  {
+    ExType? type = exTypeMap[previous().type];
+
+    TypeExpr vatiableType;
+
+    Expression? initializer;
+
+    if(type == ExType.IDENTIFIER)
+    {
+      vatiableType = IdentifierType(type!, previous());
+    }else
+    {
+      vatiableType = TypeExpr(type!);
+    }
+
+    consume(Tokentype.IDENTIFIER, '');
+
+    Token identifier = previous();
+
+    if(match([Tokentype.EQUAL]))
+    {
+      initializer = expression();
+    }
+
+    consume(Tokentype.SEMICOLON,"expected ';' after statement");
+
+    return VarDeclaration(vatiableType, identifier, initializer);
   }
 
   Expression expression()
@@ -122,6 +171,11 @@ class Parser extends ParserBase
       Expression expr = expression();
       consume(Tokentype.RIGHT_PAREN, "Expect ')' after expression");
       return Group(expr);
+    }
+
+    if(match([Tokentype.IDENTIFIER]))
+    {
+      return Variable(previous());
     }
 
     throw ExError(peek().line, peek().column, 'Expect expression', 2);
