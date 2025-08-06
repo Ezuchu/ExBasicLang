@@ -10,7 +10,9 @@ enum ExType
   BOOL,
 
   STRING, 
-  IDENTIFIER
+  IDENTIFIER,
+
+  ARRAY
 }
 
 Map<Tokentype,ExType> exTypeMap = {

@@ -8,12 +8,26 @@ abstract class Expression
 
 abstract class ExprVisitor<R>
 {
+  R visitArray(Array expr);
   R visitAssignment(Assignment expr);
   R visitBinary(Binary expr);
   R visitGroup(Group expr);
   R visitLiteral(Literal expr);
   R visitVariable(Variable expr);
   R visitUnary(Unary expr);
+}
+
+class Array extends Expression
+{
+  final List<Expression> elements;
+  final Token start;
+
+  Array(this.elements,this.start);
+
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitArray(this);
+  }
 }
 
 class Assignment extends Expression

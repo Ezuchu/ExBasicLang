@@ -184,6 +184,11 @@ class Parser extends ParserBase
     if(match([Tokentype.CHAR])) return Literal(previous(), previous().literal!, ExType.CHAR);
     if(match([Tokentype.STRING])) return Literal(previous(), previous().literal!, ExType.STRING);
 
+    if(match([Tokentype.LEFT_BRACKET]))
+    {
+      return array();
+    }
+
     if(match([Tokentype.LEFT_PAREN]))
     {
       Expression expr = expression();
@@ -197,5 +202,25 @@ class Parser extends ParserBase
     }
 
     throw ExError(peek().line, peek().column, 'Expect expression', 2);
+  }
+
+  Expression array()
+  {
+    Token start = previous();
+    List<Expression> elements = [];
+    while(!match([Tokentype.RIGHT_BRACKET]))
+    {
+      if(isAtEnd())
+      {
+        throw ExError(peek().line, peek().column, "Expected a ']'", 2);
+      }
+      if(elements.length > 0)
+      {
+        consume(Tokentype.COMMA, 'Expected a comma after expression');
+      }
+      Expression expr = equality();
+      elements.add(expr);
+    }
+    return Array(elements, start);
   }
 }

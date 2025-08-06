@@ -4,6 +4,8 @@ enum Tokentype
     RIGHT_BRACE,
     LEFT_PAREN,
     RIGHT_PAREN,
+    LEFT_BRACKET,
+    RIGHT_BRACKET,
     COMMA,
     SEMICOLON,
     DOT,

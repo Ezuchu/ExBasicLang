@@ -25,6 +25,8 @@ class Lexer extends LexerBase
             case ')': advance();addToken(Tokentype.RIGHT_PAREN);break;
             case '}': advance();addToken(Tokentype.LEFT_BRACE);break;
             case '{': advance();addToken(Tokentype.RIGHT_BRACE);break;
+            case '[': advance();addToken(Tokentype.LEFT_BRACKET);break;
+            case ']': advance();addToken(Tokentype.RIGHT_BRACKET);break;
 
             case '.': advance();addToken(Tokentype.DOT);break;
             case ',': advance();addToken(Tokentype.COMMA);break;

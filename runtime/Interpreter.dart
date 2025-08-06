@@ -4,6 +4,7 @@ import '../AST/TypeExpr.dart';
 import '../ExError.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
+import '../value/ExArray.dart';
 import '../value/ExBool.dart';
 import '../value/ExChar.dart';
 import '../value/ExDouble.dart';
@@ -70,6 +71,17 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     variable.set(newValue.getValue());
     
     return variable;
+  }
+
+  @override
+  ExValue visitArray(Array expr)
+  {
+    List<ExValue> elements = [];
+    for(Expression item in expr.elements)
+    {
+      elements.add(evaluate(item));
+    }
+    return ExArray(elements, null, elements.length);
   }
 
   @override
