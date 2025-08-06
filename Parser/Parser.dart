@@ -86,7 +86,25 @@ class Parser extends ParserBase
 
   Expression expression()
   {
-    return equality();
+    return assignment();
+  }
+
+  Expression assignment()
+  {
+    Expression expr = equality();
+
+    if(match([Tokentype.EQUAL]))
+    {
+      Token reference = previous();
+      Expression value = equality();
+
+      if(expr is Variable)
+      {
+        return Assignment(expr,value,reference);
+      }
+      throw ExError(reference.line, reference.column, 'assignment target is not a variable name.', 2);
+    }
+    return expr;
   }
 
   Expression equality()

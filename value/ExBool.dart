@@ -28,6 +28,9 @@ class ExBool extends ExValue
   {
     return value;
   }
+  @override
+  void set(value) {
+    this.value = value;
+  }
 
-  
 }

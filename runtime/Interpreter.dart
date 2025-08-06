@@ -13,7 +13,7 @@ import 'enviroment.dart';
 
 class Interpreter implements ExprVisitor,StmtVisitor{
 
-  Enviroment enviroment = Enviroment();
+  Enviroment enviroment = Enviroment(null);
 
 
   void interprete(List<Statement> statements)
@@ -36,8 +36,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override  
   visitExpressionStmt(ExpressionStmt stmt) {
-    ExValue value = evaluate(stmt.expr);
-    print(value);
+    ExValue? value = evaluate(stmt.expr);
   }
 
   @override
@@ -56,6 +55,21 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     ExValue initial = defineValue(stmt.identifier,stmt.type,value);
 
     enviroment.define(identifier, initial);
+  }
+
+  @override
+  visitAssignment(Assignment expr) {
+    Token reference = expr.reference;
+    ExValue variable = evaluate(expr.name);
+    ExValue newValue = evaluate(expr.value);
+
+    if(variable.type != newValue.type && !(variable is ExDouble && newValue is ExInt))
+    {
+      throw ExError(reference.line, reference.column, 'the type of the assignment is incompatible.', 3);
+    }
+    variable.set(newValue.getValue());
+    
+    return variable;
   }
 
   @override

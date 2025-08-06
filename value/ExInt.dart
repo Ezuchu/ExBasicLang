@@ -30,6 +30,11 @@ class ExInt extends ExValue
   {
     return value;
   }
+  
+  @override
+  void set(value) {
+    this.value = value;
+  }
 
 
 }

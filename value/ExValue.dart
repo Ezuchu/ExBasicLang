@@ -12,6 +12,8 @@ abstract class ExValue<R>
 
   ExValue copy();
 
+  set(R value);
+
   ExBool isEqual(ExValue value);
 
   R getValue();

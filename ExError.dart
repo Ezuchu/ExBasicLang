@@ -21,6 +21,8 @@ class ExError
     switch(type)
     {
       case 1: return("Lexic error at $line:$column: $message");
+      case 2: return("Syntactic error at $line:$column: $message");
+      case 3: return("Runtime error at $line:$column: $message");
     }
     return"";
   }
