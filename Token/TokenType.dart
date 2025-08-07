@@ -59,6 +59,7 @@ List<Tokentype> types = [
   Tokentype.DOUBLE_TYPE,
   Tokentype.BOOLEAN_TYPE,
   Tokentype.CHAR_TYPE,
+  Tokentype.STRING_TYPE,
   Tokentype.IDENTIFIER];
 
 Map<String, Tokentype> typeMap={

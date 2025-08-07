@@ -20,6 +20,7 @@ Map<Tokentype,ExType> exTypeMap = {
   Tokentype.DOUBLE_TYPE : ExType.DOUBLE,
   Tokentype.CHAR_TYPE : ExType.CHAR,
   Tokentype.BOOLEAN_TYPE : ExType.BOOL,
+  Tokentype.STRING_TYPE : ExType.STRING,
   Tokentype.IDENTIFIER : ExType.IDENTIFIER
 };
 

@@ -12,6 +12,7 @@ abstract class ExprVisitor<R>
   R visitAssignment(Assignment expr);
   R visitBinary(Binary expr);
   R visitGroup(Group expr);
+  R visitIndex(Index expr);
   R visitLiteral(Literal expr);
   R visitVariable(Variable expr);
   R visitUnary(Unary expr);
@@ -77,6 +78,20 @@ class Group extends Expression
   @override
   String toString() {
     return "( $expr )";
+  }
+}
+
+class Index extends Expression
+{
+  final Expression root;
+  final Token start;
+  final Expression index;
+
+  Index(this.root,this.start,this.index);
+
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitIndex(this);
   }
 }
 

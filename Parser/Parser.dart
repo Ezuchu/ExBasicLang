@@ -171,7 +171,24 @@ class Parser extends ParserBase
       return Unary(operator, right);
     }
 
-    return primary();
+    return index();
+  }
+
+  Expression index()
+  {
+    Expression expr = primary();
+
+    if(expr is Variable)
+    {
+      while(match([Tokentype.LEFT_BRACKET]))
+      {
+        Token reference = previous();
+        Expression index = equality();
+        consume(Tokentype.RIGHT_BRACKET, "Expected a ']'");
+        expr = Index(expr, reference, index);
+      }
+    }
+    return expr;
   }
 
   Expression primary()

@@ -11,7 +11,7 @@ void main()
 {
     try
     {
-      Lexer lexer = Lexer('print [1,[3,4],3];');
+      Lexer lexer = Lexer('string caja = "caja"; print caja[0]+caja[1];');
       Parser parser = Parser(lexer.scanTokens());
       Interpreter interpreter = Interpreter();
 

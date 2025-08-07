@@ -5,10 +5,12 @@ import '../ExError.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import '../value/ExArray.dart';
+import '../value/ExArrayBase.dart';
 import '../value/ExBool.dart';
 import '../value/ExChar.dart';
 import '../value/ExDouble.dart';
 import '../value/ExInt.dart';
+import '../value/ExString.dart';
 import '../value/ExValue.dart';
 import 'enviroment.dart';
 
@@ -53,22 +55,26 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
     ExValue? value = stmt.initializer == null? null : this.evaluate(stmt.initializer!);
 
+    
+
     ExValue initial = defineValue(stmt.identifier,stmt.type,value);
 
     enviroment.define(identifier, initial);
   }
 
   @override
-  visitAssignment(Assignment expr) {
+  ExValue? visitAssignment(Assignment expr) {
     Token reference = expr.reference;
     ExValue variable = evaluate(expr.name);
     ExValue newValue = evaluate(expr.value);
+
 
     if(variable.type != newValue.type && !(variable is ExDouble && newValue is ExInt))
     {
       throw ExError(reference.line, reference.column, 'the type of the assignment is incompatible.', 3);
     }
     variable.set(newValue.getValue());
+    
     
     return variable;
   }
@@ -104,7 +110,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
             return ExInt(left.getValue() + right.getValue());
           }
         }
-        throw ExError(operator.line, operator.column, 'operand types are not compatible for addition', 3);
+        return ExString(value: left.toString() + right.toString());
 
       case Tokentype.MINUS:
         if(isNumber(left) && isNumber(right))
@@ -172,6 +178,28 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return evaluate(expr.expr);
   }
 
+  @override  
+  ExValue visitIndex(Index expr)
+  {
+    ExValue variable = evaluate(expr.root);
+    Token token = expr.start;
+    
+
+    if(!(variable is ExArray || variable is ExString))
+    {
+      throw ExError(token.line, token.column, "the root variable is not a array", 3);
+    }
+
+    ExValue index = evaluate(expr.index);
+    if(!(index is ExInt)){ 
+      throw ExError(token.line, token.column, "the reference index is not an interger", 3);
+    }
+
+    ExValue value = (variable as ExArrayBase).getIndex(index,token);
+
+    return value;
+  }
+
   @override
   ExValue visitLiteral(Literal expr) {
     ExType type = expr.type;
@@ -186,6 +214,8 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       case ExType.BOOL: return ExBool(expr.value as bool);
 
       case ExType.CHAR: return ExChar(expr.value as String);
+
+      case ExType.STRING: return ExString(value: expr.value as String);
 
       default:
         throw ExError(token.line, token.column, 'Invalid literal value', 3);
@@ -237,16 +267,19 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       }
     }else
     {
+      
       switch(type.type)
       {
         case ExType.INT : initial = ExInt(null);break;
         case ExType.DOUBLE : initial = ExDouble(null);break;
         case ExType.CHAR : initial = ExChar(null);break;
         case ExType.BOOL : initial = ExBool(null);break;
+        case ExType.STRING : initial = ExString();break;
         default:
           return ExInt(5);
       }
     }
+    
     return initial;
     
   }
