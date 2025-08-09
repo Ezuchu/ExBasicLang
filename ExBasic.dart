@@ -1,6 +1,5 @@
+import 'dart:io';
 
-import 'AST/Expr.dart';
-import 'ExError.dart';
 import 'Lexer/Lexer.dart';
 import 'Parser/Parser.dart';
 import 'runtime/interpreter.dart';
@@ -11,7 +10,8 @@ void main()
 {
     try
     {
-      Lexer lexer = Lexer('string caja = "caja"; print caja[0]+caja[1];');
+      String source = File("Example/example.exb").readAsStringSync();
+      Lexer lexer = Lexer(source);
       Parser parser = Parser(lexer.scanTokens());
       Interpreter interpreter = Interpreter();
 

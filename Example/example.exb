@@ -1,0 +1,10 @@
+
+int caja = 1;
+
+START
+    int caja = 2;
+    print caja;
+
+END
+
+print caja;

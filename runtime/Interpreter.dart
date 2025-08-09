@@ -38,8 +38,19 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   }
 
   @override  
+  visitMainStmt(MainStmt stmt) {
+    Enviroment localMain = Enviroment(enviroment);
+    enviroment = localMain;
+    for(Statement statement in stmt.statements)
+    {
+      execute(statement);
+    }
+    enviroment = enviroment.enclosing!;
+  }
+
+  @override  
   visitExpressionStmt(ExpressionStmt stmt) {
-    ExValue? value = evaluate(stmt.expr);
+    evaluate(stmt.expr);
   }
 
   @override

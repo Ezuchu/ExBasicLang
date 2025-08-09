@@ -9,6 +9,7 @@ abstract class Statement
 
 abstract class StmtVisitor<R>
 {
+  R visitMainStmt(MainStmt stmt);
   R visitPrint(Print stmt);
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitVarDeclaration(VarDeclaration stmt);
@@ -24,6 +25,20 @@ class ExpressionStmt extends Statement
   R accept<R>(StmtVisitor visitor) {
     return visitor.visitExpressionStmt(this);
   }
+}
+
+class MainStmt extends Statement
+{
+  final Token start;
+  final List<Statement> statements;
+
+  MainStmt(this.start,this.statements);
+
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitMainStmt(this);
+  }
+
 }
 
 class Print extends Statement

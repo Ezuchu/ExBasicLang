@@ -1,5 +1,9 @@
 enum Tokentype 
 {
+    START,
+    END,
+
+
     LEFT_BRACE,
     RIGHT_BRACE,
     LEFT_PAREN,
@@ -63,6 +67,9 @@ List<Tokentype> types = [
   Tokentype.IDENTIFIER];
 
 Map<String, Tokentype> typeMap={
+
+  "START": Tokentype.START,
+  "END": Tokentype.END,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,

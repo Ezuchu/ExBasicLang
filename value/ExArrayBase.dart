@@ -2,7 +2,6 @@
 
 import '../ExError.dart';
 import '../Token/Token.dart';
-import 'ExDouble.dart';
 import 'ExInt.dart';
 import 'ExValue.dart';
 

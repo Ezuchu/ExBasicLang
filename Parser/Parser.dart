@@ -16,7 +16,7 @@ class Parser extends ParserBase
 
   Statement statement()
   {
-    Token act = tokens[current];
+    if(match([Tokentype.START])) return mainStmt();
     if(match([Tokentype.PRINT])) return printStmt();
 
     if(match(types))
@@ -32,6 +32,21 @@ class Parser extends ParserBase
     }
 
     return expressionStmt();
+  }
+
+  Statement mainStmt()
+  {
+    Token start = previous();
+    List<Statement> statements = [];
+
+    while(!match([Tokentype.END]))
+    {
+      if(isAtEnd()) throw ExError(peek().line, peek().column, "the main statement has not been closed", 2);
+
+      statements.add(statement());
+    }
+
+    return MainStmt(start, statements);
   }
 
   Statement expressionStmt()
