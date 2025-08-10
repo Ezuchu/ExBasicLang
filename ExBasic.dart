@@ -13,8 +13,9 @@ void main()
       String source = File("Example/example.exb").readAsStringSync();
       Lexer lexer = Lexer(source);
       Parser parser = Parser(lexer.scanTokens());
+      
       Interpreter interpreter = Interpreter();
-
+      
       interpreter.interprete(parser.parse());
     }catch(e)
     {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import '../AST/Expr.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
@@ -65,9 +67,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     Token identifier = stmt.identifier;
 
     ExValue? value = stmt.initializer == null? null : this.evaluate(stmt.initializer!);
-
     
-
     ExValue initial = defineValue(stmt.identifier,stmt.type,value);
 
     enviroment.define(identifier, initial);
@@ -75,16 +75,13 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override
   ExValue? visitAssignment(Assignment expr) {
+    
     Token reference = expr.reference;
     ExValue variable = evaluate(expr.name);
     ExValue newValue = evaluate(expr.value);
 
-
-    if(variable.type != newValue.type && !(variable is ExDouble && newValue is ExInt))
-    {
-      throw ExError(reference.line, reference.column, 'the type of the assignment is incompatible.', 3);
-    }
-    variable.set(newValue.getValue());
+    
+    variable.set(newValue,reference);
     
     
     return variable;
@@ -94,10 +91,12 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   ExValue visitArray(Array expr)
   {
     List<ExValue> elements = [];
+    
     for(Expression item in expr.elements)
     {
       elements.add(evaluate(item));
     }
+    ExType? contentType = arrayContentType(elements);
     return ExArray(elements, null, elements.length);
   }
 
@@ -260,39 +259,51 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return enviroment.get(expr.name);
   }
 
+  ExType? arrayContentType(List<ExValue> elements)
+  {
+    if(elements.isEmpty) return null;
+
+    ExType type = elements[0].type;
+
+    for(ExValue item in elements)
+    {
+      if(item.type != type) return null;
+    }
+    return type;
+  }
+
   ExValue defineValue(Token name, TypeExpr type, ExValue? value)
   {
     ExValue initial;
-    if(value != null)
-    {
-      if(type.type != value.type && !(type.type == ExType.DOUBLE && value.type == ExType.INT))
-      {
-        throw ExError(name.line, name.column, 'incompatible types in declaration', 3);
-      }
-      if(type.type == ExType.DOUBLE && value.type == ExType.INT)
-      {
-        initial = ExDouble(value.getValue());
-      }else
-      {
-        initial = value;
-      }
-    }else
-    {
-      
-      switch(type.type)
-      {
-        case ExType.INT : initial = ExInt(null);break;
-        case ExType.DOUBLE : initial = ExDouble(null);break;
-        case ExType.CHAR : initial = ExChar(null);break;
-        case ExType.BOOL : initial = ExBool(null);break;
-        case ExType.STRING : initial = ExString();break;
-        default:
-          return ExInt(5);
-      }
-    }
     
+
+    switch(type.type)
+    {
+      case ExType.INT : initial = ExInt(null);break;
+      case ExType.DOUBLE : initial = ExDouble(null);break;
+      case ExType.CHAR : initial = ExChar(null);break;
+      case ExType.BOOL : initial = ExBool(null);break;
+      case ExType.STRING : initial = ExString();break;
+      case ExType.ARRAY : initial = decArray(type as ArrayType, name);break;
+      default:
+        return ExInt(5);
+    }
+
+    if(value != null) initial.set(value,name);
+
     return initial;
     
+  }
+
+  ExValue decArray(ArrayType type, Token name)
+  {
+    ExValue dimension = evaluate(type.dimensionExpr);
+    if(!(dimension is ExInt)) throw ExError(name.line, name.column, "array dimension is not a interger", 3);
+
+    List <ExValue> items = List<ExValue>.generate(dimension.getValue(), (int index) => defineValue(name,type.itemType,null));
+
+
+    return ExArray(items, type.itemType.type, dimension.getValue());
   }
 
   ExValue createNumber(num value)

@@ -21,7 +21,7 @@ class Parser extends ParserBase
 
     if(match(types))
     {
-      if(match([Tokentype.IDENTIFIER]))
+      if(match([Tokentype.IDENTIFIER,Tokentype.LESS]))
       {
         current--;
         return varDeclarationStmt();
@@ -73,17 +73,10 @@ class Parser extends ParserBase
   {
     ExType? type = exTypeMap[previous().type];
 
-    TypeExpr vatiableType;
+    TypeExpr variableType = typeExpression(type!);
+
 
     Expression? initializer;
-
-    if(type == ExType.IDENTIFIER)
-    {
-      vatiableType = IdentifierType(type!, previous());
-    }else
-    {
-      vatiableType = TypeExpr(type!);
-    }
 
     consume(Tokentype.IDENTIFIER, '');
 
@@ -96,7 +89,7 @@ class Parser extends ParserBase
 
     consume(Tokentype.SEMICOLON,"expected ';' after statement");
 
-    return VarDeclaration(vatiableType, identifier, initializer);
+    return VarDeclaration(variableType, identifier, initializer);
   }
 
   Expression expression()
@@ -107,7 +100,8 @@ class Parser extends ParserBase
   Expression assignment()
   {
     Expression expr = equality();
-
+    
+    
     if(match([Tokentype.EQUAL]))
     {
       Token reference = previous();
@@ -115,6 +109,7 @@ class Parser extends ParserBase
 
       if(expr is Variable)
       {
+        
         return Assignment(expr,value,reference);
       }
       throw ExError(reference.line, reference.column, 'assignment target is not a variable name.', 2);
@@ -254,5 +249,31 @@ class Parser extends ParserBase
       elements.add(expr);
     }
     return Array(elements, start);
+  }
+
+  TypeExpr typeExpression(ExType type)
+  {
+    switch(type)
+    {
+      case ExType.ARRAY:return arrayTypeExpression();
+      default:
+        return TypeExpr(type);
+    }
+  }
+
+  TypeExpr arrayTypeExpression()
+  {
+    consume(Tokentype.LESS, "Expected '<'");
+    if(!match(types))
+    {
+      throw ExError(peek().line, peek().column, "expected a valid type expression", 2);
+    }
+    ExType? itemType = exTypeMap[previous().type];
+    TypeExpr itemTypeExpr = typeExpression(itemType!);
+    consume(Tokentype.LEFT_BRACKET, "Expected '['");
+    Expression dimension = equality();
+    consume(Tokentype.RIGHT_BRACKET, "Expected ']'");
+    consume(Tokentype.GREATER, "Expected '>'");
+    return ArrayType(itemTypeExpr,dimension);
   }
 }

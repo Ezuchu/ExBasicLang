@@ -17,6 +17,7 @@ abstract class ParserBase
     List<Statement> statements = [];
     while(!isAtEnd())
     {
+      
       statements.add(statement());
     }
     return statements;

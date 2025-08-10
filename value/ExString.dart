@@ -1,6 +1,8 @@
 
 
 import '../AST/TypeExpr.dart';
+import '../ExError.dart';
+import '../Token/Token.dart';
 import 'ExArrayBase.dart';
 import 'ExBool.dart';
 import 'ExChar.dart';
@@ -31,8 +33,12 @@ class ExString extends ExArrayBase implements ExValue
   }
 
   @override
-  set(value) {
-    elements = (value as String).split("").map((c) => ExChar(c)).toList();
+  set(ExValue value, Token token) {
+
+    if(!(value is ExString)) throw ExError(token.line, token.column, "incompatible types in assignment",3);
+
+
+    elements = (value.getValue()).split("").map((c) => ExChar(c)).toList();
   }
 
   @override

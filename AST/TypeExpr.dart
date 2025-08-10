@@ -1,6 +1,7 @@
 
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
+import 'Expr.dart';
 
 enum ExType
 {
@@ -21,6 +22,7 @@ Map<Tokentype,ExType> exTypeMap = {
   Tokentype.CHAR_TYPE : ExType.CHAR,
   Tokentype.BOOLEAN_TYPE : ExType.BOOL,
   Tokentype.STRING_TYPE : ExType.STRING,
+  Tokentype.ARRAY_TYPE : ExType.ARRAY,
   Tokentype.IDENTIFIER : ExType.IDENTIFIER
 };
 
@@ -29,6 +31,13 @@ class TypeExpr
   ExType type;
 
   TypeExpr(this.type);
+
+  @override
+  bool operator ==(Object other) {
+    if(other is TypeExpr) return type == other.type;
+
+    return super == other;
+  }
 }
 
 class IdentifierType extends TypeExpr
@@ -36,5 +45,15 @@ class IdentifierType extends TypeExpr
   Token identifier;
 
   IdentifierType(ExType type,this.identifier):super(type);
+}
+
+class ArrayType extends TypeExpr
+{
+  TypeExpr itemType;
+  Expression dimensionExpr;
+
+  ArrayType(this.itemType,this.dimensionExpr):super(ExType.ARRAY);
+
+  
 }
 

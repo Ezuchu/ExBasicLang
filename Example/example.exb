@@ -1,10 +1,5 @@
-
-int caja = 1;
-
 START
-    int caja = 2;
-    print caja;
-
+    Array<Array<int[2]>[2]> caja = [[1,2],[3,2]];
+    print caja[1][1];
 END
 
-print caja;

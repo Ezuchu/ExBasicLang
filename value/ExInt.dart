@@ -1,6 +1,8 @@
 
 
 import '../AST/TypeExpr.dart';
+import '../ExError.dart';
+import '../Token/Token.dart';
 import 'ExBool.dart';
 import 'ExValue.dart';
 
@@ -32,8 +34,10 @@ class ExInt extends ExValue
   }
   
   @override
-  void set(value) {
-    this.value = value;
+  void set(ExValue value,Token token) {
+    if(!(value is ExInt)) throw ExError(token.line,token.column,"incompatible types in assignment",3);
+
+    this.value = value.getValue();
   }
 
 

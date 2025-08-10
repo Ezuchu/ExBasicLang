@@ -1,4 +1,5 @@
 import '../AST/TypeExpr.dart';
+import '../Token/Token.dart';
 import 'ExBool.dart';
 
 abstract class ExValue<R>
@@ -12,7 +13,7 @@ abstract class ExValue<R>
 
   ExValue copy();
 
-  set(R value);
+  set(ExValue value, Token token);
 
   ExBool isEqual(ExValue value);
 
