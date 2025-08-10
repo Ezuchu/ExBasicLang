@@ -107,9 +107,8 @@ class Parser extends ParserBase
       Token reference = previous();
       Expression value = equality();
 
-      if(expr is Variable)
+      if(expr is Variable || expr is Index)
       {
-        
         return Assignment(expr,value,reference);
       }
       throw ExError(reference.line, reference.column, 'assignment target is not a variable name.', 2);
