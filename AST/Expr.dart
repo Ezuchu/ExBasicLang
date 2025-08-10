@@ -15,6 +15,7 @@ abstract class ExprVisitor<R>
   R visitIndex(Index expr);
   R visitLiteral(Literal expr);
   R visitLogical(Logical expr);
+  R visitPostFix(PostFix expr);
   R visitVariable(Variable expr);
   R visitUnary(Unary expr);
 }
@@ -148,6 +149,19 @@ class Logical extends Expression
     return "$left $operator $right";
   }
   
+}
+
+class PostFix extends Expression
+{
+  final Token operator;
+  final Expression operand;
+
+  PostFix(this.operator,this.operand);
+
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitPostFix(this);
+  }
 }
 
 class Variable extends Expression

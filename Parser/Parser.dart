@@ -257,7 +257,20 @@ class Parser extends ParserBase
       return Unary(operator, right);
     }
 
-    return index();
+    return postFix();
+  }
+
+  Expression postFix()
+  {
+    Expression expr = index();
+
+    if(match([Tokentype.PLUS_PLUS,Tokentype.MINUS_MINUS]))
+    {
+      Token operator = previous();
+      return PostFix(operator, expr);
+    }
+
+    return expr;
   }
 
   Expression index()

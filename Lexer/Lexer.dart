@@ -32,8 +32,10 @@ class Lexer extends LexerBase
             case ',': advance();addToken(Tokentype.COMMA);break;
             case ';': advance();addToken(Tokentype.SEMICOLON);break;
 
-            case '+':advance();addToken(Tokentype.PLUS);break;
-            case '-':advance();addToken(Tokentype.MINUS);break;
+            case '+':advance();addToken(match('+')? Tokentype.PLUS_PLUS : Tokentype.PLUS);break;
+              
+            case '-':advance();addToken(match('-')?Tokentype.MINUS_MINUS : Tokentype.MINUS);break;
+            
             case '*':advance();addToken(Tokentype.STAR);break;
 
             case '&':advance();

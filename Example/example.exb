@@ -1,9 +1,7 @@
 START
     int caja = 4;
-    while(caja < 7)
-    {
-        caja = caja + 1;
-        print caja;
-    }
+    print caja;
+    caja--;
+    print caja;
 END
 

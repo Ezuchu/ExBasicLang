@@ -282,6 +282,24 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return ExBool(isTruthy(evaluate(expr.right)));
   }
 
+  @override  
+  ExValue visitPostFix(PostFix expr)
+  {
+    ExValue initial = evaluate(expr.operand);
+
+    ExValue copy = initial.copy();
+
+    if(expr.operator.type == Tokentype.PLUS_PLUS)
+    {
+      initial.set(ExInt(initial.getValue()+1),expr.operator);
+    }else
+    {
+      initial.set(ExInt(initial.getValue()-1),expr.operator);
+    }
+
+    return copy;
+  }
+
   @override
   ExValue visitUnary(Unary expr) {
     ExValue right = evaluate(expr.expr);

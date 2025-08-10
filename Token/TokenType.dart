@@ -25,6 +25,9 @@ enum Tokentype
     STAR,
     SLASH,
 
+    PLUS_PLUS,
+    MINUS_MINUS,
+
     AND,
     OR,
 
