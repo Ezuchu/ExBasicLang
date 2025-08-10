@@ -64,6 +64,11 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     enviroment = enviroment.enclosing!;
   }
 
+  @override
+  void visitBlockStatement(BlockStatement stmt) {
+    executeBlock(stmt.statements);
+  }
+
   @override  
   visitExpressionStmt(ExpressionStmt stmt) {
     evaluate(stmt.expr);
@@ -73,10 +78,10 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   visitIfStatement(IfStatement stmt) {
     if(isTruthy(evaluate(stmt.condition)))
     {
-      executeBlock(stmt.thenBranch);
-    }else if(stmt.elseBranch.isNotEmpty)
+      execute(stmt.thenBranch);
+    }else if(stmt.elseBranch != null)
     {
-      executeBlock(stmt.elseBranch);
+      execute(stmt.elseBranch!);
     } 
   }
 

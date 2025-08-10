@@ -17,8 +17,10 @@ class Parser extends ParserBase
   Statement statement()
   {
     if(match([Tokentype.START])) return mainStmt();
-    if(match([Tokentype.PRINT])) return printStmt();
+    if(match([Tokentype.LEFT_BRACE])) return blockStatement();
     if(match([Tokentype.IF])) return ifStmt();
+    if(match([Tokentype.PRINT])) return printStmt();
+    
 
     if(match(types))
     {
@@ -50,6 +52,15 @@ class Parser extends ParserBase
     return MainStmt(start, statements);
   }
 
+  Statement blockStatement()
+  {
+    List<Statement> statements = [];
+
+    addStatementsTo(statements);
+
+    return BlockStatement(statements);
+  }
+
   Statement expressionStmt()
   {
     Expression expr = expression();
@@ -67,28 +78,14 @@ class Parser extends ParserBase
     Expression condition = expression();
     consume(Tokentype.RIGHT_PAREN, "Expected ')' after condition");
 
-    List<Statement> thenBranch = [];
-    List<Statement> elseBranch = [];
+    Statement thenBranch = statement();;
+    Statement? elseBranch;
     
-    if(match([Tokentype.LEFT_BRACE]))
-    {
-      
-      addStatementsTo(thenBranch);
-    }else
-    {
-      thenBranch.add(statement());
-    }
 
-    if(match([Tokentype.ELSE]))
-    {
-      if(match([Tokentype.LEFT_BRACE]))
-      {
-        addStatementsTo(elseBranch);
-      }else
-      {
-        elseBranch.add(statement());
-      }
-    }
+
+
+    if(match([Tokentype.ELSE])) elseBranch = statement();
+
 
     return IfStatement(start, condition, thenBranch, elseBranch);
     

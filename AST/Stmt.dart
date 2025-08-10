@@ -10,10 +10,25 @@ abstract class Statement
 abstract class StmtVisitor<R>
 {
   R visitMainStmt(MainStmt stmt);
+  R visitBlockStatement(BlockStatement stmt);
   R visitPrint(Print stmt);
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitIfStatement(IfStatement stmt);
   R visitVarDeclaration(VarDeclaration stmt);
+}
+
+class BlockStatement extends Statement
+{
+  List<Statement> statements;
+
+  BlockStatement(this.statements);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitBlockStatement(this);
+  }
+
+  
 }
 
 class ExpressionStmt extends Statement
@@ -32,8 +47,8 @@ class IfStatement extends Statement
 {
   final Token start;
   final Expression condition;
-  final List<Statement> thenBranch;
-  final List<Statement> elseBranch;
+  final Statement thenBranch;
+  final Statement? elseBranch;
 
   IfStatement(this.start,this.condition,this.thenBranch,this.elseBranch);
   
