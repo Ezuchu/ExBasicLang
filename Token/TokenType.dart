@@ -3,6 +3,9 @@ enum Tokentype
     START,
     END,
 
+    IF,
+    ELSE,
+
 
     LEFT_BRACE,
     RIGHT_BRACE,
@@ -75,6 +78,9 @@ Map<String, Tokentype> typeMap={
 
   "START": Tokentype.START,
   "END" : Tokentype.END,
+
+  "if" : Tokentype.IF,
+  "else" : Tokentype.ELSE,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,

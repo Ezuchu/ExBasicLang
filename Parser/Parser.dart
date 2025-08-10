@@ -18,6 +18,7 @@ class Parser extends ParserBase
   {
     if(match([Tokentype.START])) return mainStmt();
     if(match([Tokentype.PRINT])) return printStmt();
+    if(match([Tokentype.IF])) return ifStmt();
 
     if(match(types))
     {
@@ -56,6 +57,41 @@ class Parser extends ParserBase
     consume(Tokentype.SEMICOLON, "Expect ';' after sentence");
 
     return ExpressionStmt(expr);
+  }
+
+  Statement ifStmt()
+  {
+    Token start = previous();
+    consume(Tokentype.LEFT_PAREN, "Expected '(' after if");
+
+    Expression condition = expression();
+    consume(Tokentype.RIGHT_PAREN, "Expected ')' after condition");
+
+    List<Statement> thenBranch = [];
+    List<Statement> elseBranch = [];
+    
+    if(match([Tokentype.LEFT_BRACE]))
+    {
+      
+      addStatementsTo(thenBranch);
+    }else
+    {
+      thenBranch.add(statement());
+    }
+
+    if(match([Tokentype.ELSE]))
+    {
+      if(match([Tokentype.LEFT_BRACE]))
+      {
+        addStatementsTo(elseBranch);
+      }else
+      {
+        elseBranch.add(statement());
+      }
+    }
+
+    return IfStatement(start, condition, thenBranch, elseBranch);
+    
   }
 
   Statement printStmt()
@@ -276,6 +312,16 @@ class Parser extends ParserBase
       elements.add(expr);
     }
     return Array(elements, start);
+  }
+
+  void addStatementsTo(List<Statement> group)
+  {
+    while(!match([Tokentype.RIGHT_BRACE]))
+    {
+      if(isAtEnd())throw ExError(peek().line, peek().line, "a conditional statement has not been closed", 2);
+
+      group.add(statement());
+    }
   }
 
   TypeExpr typeExpression(ExType type)

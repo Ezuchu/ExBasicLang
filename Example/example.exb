@@ -1,7 +1,18 @@
 START
-    int caja = 3;
-    int cajon = 4;
-    print caja == 2 && cajon == 4;
-    print caja == 2 || cajon == 4;
+    int caja = 4;
+    if(caja == 3) print("SI");
+    else print("NO");
+
+    char cajon = '2';
+    if(cajon == '1')
+    {
+        int caja = 2;
+        print caja;
+    }else
+    {
+        double caja = 3.0;
+        print caja;
+    }
+    print caja;
 END
 

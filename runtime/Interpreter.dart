@@ -34,10 +34,24 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     stmt.accept(this);
   }
 
+  void executeBlock(List<Statement> statements)
+  {
+    Enviroment local = Enviroment(enviroment);
+    enviroment = local;
+
+    for(Statement statement in statements)
+    {
+      execute(statement);
+    }
+    enviroment = enviroment.enclosing!;
+  }
+
   ExValue evaluate(Expression expr)
   {
     return expr.accept(this);
   }
+
+  
 
   @override  
   visitMainStmt(MainStmt stmt) {
@@ -53,6 +67,17 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   @override  
   visitExpressionStmt(ExpressionStmt stmt) {
     evaluate(stmt.expr);
+  }
+
+  @override  
+  visitIfStatement(IfStatement stmt) {
+    if(isTruthy(evaluate(stmt.condition)))
+    {
+      executeBlock(stmt.thenBranch);
+    }else if(stmt.elseBranch.isNotEmpty)
+    {
+      executeBlock(stmt.elseBranch);
+    } 
   }
 
   @override

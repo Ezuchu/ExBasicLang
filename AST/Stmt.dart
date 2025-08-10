@@ -12,6 +12,7 @@ abstract class StmtVisitor<R>
   R visitMainStmt(MainStmt stmt);
   R visitPrint(Print stmt);
   R visitExpressionStmt(ExpressionStmt stmt);
+  R visitIfStatement(IfStatement stmt);
   R visitVarDeclaration(VarDeclaration stmt);
 }
 
@@ -38,8 +39,7 @@ class IfStatement extends Statement
   
   @override
   R accept<R>(StmtVisitor visitor) {
-    // TODO: implement accept
-    throw UnimplementedError();
+    return visitor.visitIfStatement(this);
   }
 }
 
