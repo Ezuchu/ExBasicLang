@@ -1,18 +1,9 @@
 START
     int caja = 4;
-    if(caja == 3) print("SI");
-    else print("NO");
-
-    char cajon = '2';
-    if(cajon == '1')
+    while(caja < 7)
     {
-        int caja = 2;
-        print caja;
-    }else
-    {
-        double caja = 3.0;
+        caja = caja + 1;
         print caja;
     }
-    print caja;
 END
 

@@ -15,6 +15,7 @@ abstract class StmtVisitor<R>
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitIfStatement(IfStatement stmt);
   R visitVarDeclaration(VarDeclaration stmt);
+  R visitWhileStatement(WhileStatement stmt);
 }
 
 class BlockStatement extends Statement
@@ -98,4 +99,20 @@ class VarDeclaration extends Statement
   R accept<R>(StmtVisitor visitor) {
     return visitor.visitVarDeclaration(this);
   }
+}
+
+class WhileStatement extends Statement
+{
+  final Token start;
+  final Expression condition;
+  final Statement body;
+
+  WhileStatement(this.start,this.condition,this.body);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitWhileStatement(this);
+  }
+
+  
 }

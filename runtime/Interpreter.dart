@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import '../AST/Expr.dart';
 import '../AST/Stmt.dart';
@@ -103,6 +102,11 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     enviroment.define(identifier, initial);
   }
 
+  @override  
+  visitWhileStatement(WhileStatement stmt) {
+    while(isTruthy(evaluate(stmt.condition))) execute(stmt.body); 
+  }
+
   @override
   ExValue? visitAssignment(Assignment expr) {
     
@@ -127,7 +131,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       elements.add(evaluate(item));
     }
     ExType? contentType = arrayContentType(elements);
-    return ExArray(elements, null, elements.length);
+    return ExArray(elements, contentType, elements.length);
   }
 
   @override
