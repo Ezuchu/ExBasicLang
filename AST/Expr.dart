@@ -14,6 +14,7 @@ abstract class ExprVisitor<R>
   R visitGroup(Group expr);
   R visitIndex(Index expr);
   R visitLiteral(Literal expr);
+  R visitLogical(Logical expr);
   R visitVariable(Variable expr);
   R visitUnary(Unary expr);
 }
@@ -29,6 +30,11 @@ class Array extends Expression
   R accept<R>(ExprVisitor visitor) {
     return visitor.visitArray(this);
   }
+
+  @override
+  String toString() {
+    return "$elements";
+  }
 }
 
 class Assignment extends Expression
@@ -42,6 +48,11 @@ class Assignment extends Expression
   @override
   R accept<R>(ExprVisitor visitor) {
     return visitor.visitAssignment(this);
+  }
+
+  @override
+  String toString() {
+    return "$name = $value";
   }
 }
 
@@ -93,6 +104,11 @@ class Index extends Expression
   R accept<R>(ExprVisitor visitor) {
     return visitor.visitIndex(this);
   }
+
+  @override
+  String toString() {
+    return "$root[$index]";
+  }
 }
 
 class Literal extends Expression
@@ -114,6 +130,26 @@ class Literal extends Expression
   }
 }
 
+class Logical extends Expression
+{
+  final Token operator;
+  final Expression left;
+  final Expression right;
+
+  Logical(this.operator,this.left,this.right);
+  
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitLogical(this);
+  }
+
+  @override
+  String toString() {
+    return "$left $operator $right";
+  }
+  
+}
+
 class Variable extends Expression
 {
   final Token name;
@@ -123,6 +159,11 @@ class Variable extends Expression
   R accept<R>(ExprVisitor visitor)
   {
     return visitor.visitVariable(this);
+  }
+
+  @override
+  String toString() {
+    return "$Variable";
   }
 }
 

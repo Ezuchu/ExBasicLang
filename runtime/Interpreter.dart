@@ -233,6 +233,22 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   }
 
   @override
+  ExValue visitLogical(Logical expr)
+  {
+    ExValue left = evaluate(expr.left);
+
+    if(expr.operator.type == Tokentype.OR)
+    {
+      if(isTruthy(left)) return ExBool(true);
+    }else
+    {
+      if(!isTruthy(left)) return ExBool(false);
+    }
+
+    return ExBool(isTruthy(evaluate(expr.right)));
+  }
+
+  @override
   ExValue visitUnary(Unary expr) {
     ExValue right = evaluate(expr.expr);
     Token operator = expr.operand;
@@ -322,6 +338,15 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       return true;
     }
     return false;
+  }
+
+  bool isTruthy(ExValue value)
+  {
+    if(!(value is ExBool))
+    {
+      return value.getValue() != null;
+    }
+    return value.getValue();
   }
 
   void areNumbers(ExValue left, ExValue right,Token reference)

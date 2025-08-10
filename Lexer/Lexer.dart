@@ -36,6 +36,14 @@ class Lexer extends LexerBase
             case '-':advance();addToken(Tokentype.MINUS);break;
             case '*':advance();addToken(Tokentype.STAR);break;
 
+            case '&':advance();
+              if(!match('&')) throw ExError(line, column, 'incompleted symbol', 1);
+              addToken(Tokentype.AND);break;
+
+            case '|':advance();
+              if(!match('|')) throw ExError(line, column, 'incompleted symbol', 1);
+              addToken(Tokentype.OR);break;
+
 
             case '\'': advance();scanChar();break;
             case '\"': advance();scanString();break;

@@ -1,6 +1,7 @@
 START
-    Array<Array<int[2]>[2]> caja = [[1,2],[3,2]];
-    caja = [[5,6],[7,8]];
-    print caja;
+    int caja = 3;
+    int cajon = 4;
+    print caja == 2 && cajon == 4;
+    print caja == 2 || cajon == 4;
 END
 

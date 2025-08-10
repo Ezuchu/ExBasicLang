@@ -21,6 +21,9 @@ enum Tokentype
     STAR,
     SLASH,
 
+    AND,
+    OR,
+
     BANG,
     EQUAL,
     LESS,
@@ -71,7 +74,7 @@ List<Tokentype> types = [
 Map<String, Tokentype> typeMap={
 
   "START": Tokentype.START,
-  "END": Tokentype.END,
+  "END" : Tokentype.END,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,

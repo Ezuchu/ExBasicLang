@@ -99,13 +99,13 @@ class Parser extends ParserBase
 
   Expression assignment()
   {
-    Expression expr = equality();
+    Expression expr = or();
     
     
     if(match([Tokentype.EQUAL]))
     {
       Token reference = previous();
-      Expression value = equality();
+      Expression value = or();
 
       if(expr is Variable || expr is Index)
       {
@@ -113,6 +113,34 @@ class Parser extends ParserBase
       }
       throw ExError(reference.line, reference.column, 'assignment target is not a variable name.', 2);
     }
+    return expr;
+  }
+
+  Expression or()
+  {
+    Expression expr = and();
+
+    while(match([Tokentype.OR]))
+    {
+      Token operator = previous();
+      Expression right = and();
+      expr = Logical(operator, expr, right);
+    }
+
+    return expr;
+  }
+
+  Expression and()
+  {
+    Expression expr = equality();
+
+    while(match([Tokentype.AND]))
+    {
+      Token operator = previous();
+      Expression right = equality();
+      expr = Logical(operator, expr, right);
+    }
+
     return expr;
   }
 
@@ -244,7 +272,7 @@ class Parser extends ParserBase
       {
         consume(Tokentype.COMMA, 'Expected a comma after expression');
       }
-      Expression expr = equality();
+      Expression expr = or();
       elements.add(expr);
     }
     return Array(elements, start);
@@ -270,7 +298,7 @@ class Parser extends ParserBase
     ExType? itemType = exTypeMap[previous().type];
     TypeExpr itemTypeExpr = typeExpression(itemType!);
     consume(Tokentype.LEFT_BRACKET, "Expected '['");
-    Expression dimension = equality();
+    Expression dimension = or();
     consume(Tokentype.RIGHT_BRACKET, "Expected ']'");
     consume(Tokentype.GREATER, "Expected '>'");
     return ArrayType(itemTypeExpr,dimension);

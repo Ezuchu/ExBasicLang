@@ -27,6 +27,22 @@ class ExpressionStmt extends Statement
   }
 }
 
+class IfStatement extends Statement
+{
+  final Token start;
+  final Expression condition;
+  final List<Statement> thenBranch;
+  final List<Statement> elseBranch;
+
+  IfStatement(this.start,this.condition,this.thenBranch,this.elseBranch);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    // TODO: implement accept
+    throw UnimplementedError();
+  }
+}
+
 class MainStmt extends Statement
 {
   final Token start;
