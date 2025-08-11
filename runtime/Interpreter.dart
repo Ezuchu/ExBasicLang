@@ -74,6 +74,16 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   }
 
   @override  
+  visitDoStmt(DoStmt stmt) {
+    bool pass = true;
+    while(pass)
+    {
+      execute(stmt.body);
+      pass = !isTruthy(evaluate(stmt.condition));
+    }
+  }
+
+  @override  
   visitIfStatement(IfStatement stmt) {
     if(isTruthy(evaluate(stmt.condition)))
     {

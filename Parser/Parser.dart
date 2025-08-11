@@ -21,6 +21,7 @@ class Parser extends ParserBase
     if(match([Tokentype.IF])) return ifStmt();
     if(match([Tokentype.WHILE])) return whileStmt();
     if(match([Tokentype.FOR])) return forStmt();
+    if(match([Tokentype.DO])) return doStmt();
     if(match([Tokentype.PRINT])) return printStmt();
 
     
@@ -62,6 +63,21 @@ class Parser extends ParserBase
     addStatementsTo(statements);
 
     return BlockStatement(statements);
+  }
+
+  Statement doStmt()
+  {
+    Token start = previous();
+
+    Statement body = statement();
+
+    consume(Tokentype.UNTIL, "Expected the condition to end the repeat loop");
+    consume(Tokentype.LEFT_PAREN, "Expected '(' after until");
+    Expression condition = expression();
+    consume(Tokentype.RIGHT_PAREN, "Expected ')' after condition");
+    consume(Tokentype.SEMICOLON, "Expected ';' after statement");
+
+    return DoStmt(body, condition);
   }
 
   Statement expressionStmt()

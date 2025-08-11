@@ -1,11 +1,9 @@
 START
     int a = 0;
-    int temp;
-    for(int b = 1; a < 100; b = temp + b)
+    do
     {
         print a;
-        temp = a;
-        a = b;
-    }
+        a++;
+    }until(a == 7);
 END
 

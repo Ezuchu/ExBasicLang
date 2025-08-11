@@ -7,6 +7,8 @@ enum Tokentype
     ELSE,
     WHILE,
     FOR,
+    DO,
+    UNTIL,
 
 
     LEFT_BRACE,
@@ -88,6 +90,8 @@ Map<String, Tokentype> typeMap={
   "else" : Tokentype.ELSE,
   "while" : Tokentype.WHILE,
   "for" :Tokentype.FOR,
+  "do" : Tokentype.DO,
+  "until" : Tokentype.UNTIL,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,

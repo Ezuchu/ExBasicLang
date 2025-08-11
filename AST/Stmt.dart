@@ -11,6 +11,7 @@ abstract class StmtVisitor<R>
 {
   R visitMainStmt(MainStmt stmt);
   R visitBlockStatement(BlockStatement stmt);
+  R visitDoStmt(DoStmt stmt);
   R visitPrint(Print stmt);
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitIfStatement(IfStatement stmt);
@@ -27,6 +28,20 @@ class BlockStatement extends Statement
   @override
   R accept<R>(StmtVisitor visitor) {
     return visitor.visitBlockStatement(this);
+  }
+
+}
+
+class DoStmt extends Statement
+{
+  final Statement body;
+  final Expression condition;
+
+  DoStmt(this.body,this.condition);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitDoStmt(this);
   }
 
   
