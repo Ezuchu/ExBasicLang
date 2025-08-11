@@ -1,7 +1,11 @@
 START
-    int caja = 4;
-    print caja;
-    caja--;
-    print caja;
+    int a = 0;
+    int temp;
+    for(int b = 1; a < 100; b = temp + b)
+    {
+        print a;
+        temp = a;
+        a = b;
+    }
 END
 

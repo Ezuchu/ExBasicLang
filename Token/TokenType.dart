@@ -6,6 +6,7 @@ enum Tokentype
     IF,
     ELSE,
     WHILE,
+    FOR,
 
 
     LEFT_BRACE,
@@ -86,6 +87,7 @@ Map<String, Tokentype> typeMap={
   "if" : Tokentype.IF,
   "else" : Tokentype.ELSE,
   "while" : Tokentype.WHILE,
+  "for" :Tokentype.FOR,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,

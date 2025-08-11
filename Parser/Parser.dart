@@ -20,6 +20,7 @@ class Parser extends ParserBase
     if(match([Tokentype.LEFT_BRACE])) return blockStatement();
     if(match([Tokentype.IF])) return ifStmt();
     if(match([Tokentype.WHILE])) return whileStmt();
+    if(match([Tokentype.FOR])) return forStmt();
     if(match([Tokentype.PRINT])) return printStmt();
 
     
@@ -83,14 +84,47 @@ class Parser extends ParserBase
     Statement thenBranch = statement();;
     Statement? elseBranch;
     
-
-
-
     if(match([Tokentype.ELSE])) elseBranch = statement();
 
+    return IfStatement(start, condition, thenBranch, elseBranch);    
+  }
 
-    return IfStatement(start, condition, thenBranch, elseBranch);
+  Statement forStmt()
+  {
+    Token start = previous();
+    consume(Tokentype.LEFT_PAREN, "Expected '(' after for");
+
+    Statement? initializer;
+    if(match([Tokentype.SEMICOLON]))
+    {
+      initializer = null;
+    }else
+    {
+      initializer = statement();
+      if(!(initializer is VarDeclaration || initializer is ExpressionStmt))
+      {
+        throw ExError(previous().line, previous().column, "the initializer is not a valid declaration", 2);
+      }
+    }
+    Expression? condition;
+
+    if(!check(Tokentype.SEMICOLON)) condition = expression();
+    consume(Tokentype.SEMICOLON, "Expect ';' after loop condition");
+
+    Expression? increment;
+    if(!check(Tokentype.RIGHT_PAREN)) increment = expression();
+    consume(Tokentype.RIGHT_PAREN, "Expect ')' after expression");
+
     
+    Statement body = statement();
+    if(increment != null) body = BlockStatement([body,ExpressionStmt(increment)]);
+
+    if(condition == null) condition = Literal(previous(), true, ExType.BOOL);
+    body = WhileStatement(start, condition, body);
+
+    if(initializer != null) body = BlockStatement([initializer,body]);
+
+    return body;
   }
 
   Statement printStmt()
