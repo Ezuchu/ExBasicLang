@@ -1,5 +1,6 @@
 import '../Token/Token.dart';
 import 'Expr.dart';
+import 'Parameter.dart';
 import 'TypeExpr.dart';
 
 abstract class Statement
@@ -12,9 +13,11 @@ abstract class StmtVisitor<R>
   R visitMainStmt(MainStmt stmt);
   R visitBlockStatement(BlockStatement stmt);
   R visitDoStmt(DoStmt stmt);
+  R visitFunDeclaration(FunDeclaration stmt);
   R visitPrint(Print stmt);
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitIfStatement(IfStatement stmt);
+  R visitReturnStmt(ReturnStmt stmt);
   R visitVarDeclaration(VarDeclaration stmt);
   R visitWhileStatement(WhileStatement stmt);
 }
@@ -59,6 +62,21 @@ class ExpressionStmt extends Statement
   }
 }
 
+class FunDeclaration extends Statement
+{
+  final Token name;
+  final List<Parameter> parameters;
+  final Statement body;
+  final TypeExpr returnType;
+
+  FunDeclaration(this.name,this.parameters,this.body,this.returnType);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitFunDeclaration(this);
+  }
+}
+
 class IfStatement extends Statement
 {
   final Token start;
@@ -100,6 +118,21 @@ class Print extends Statement
   {
     return visitor.visitPrint(this);
   }
+}
+
+class ReturnStmt extends Statement
+{
+  final Token keyword;
+  final Expression? expr;
+
+  ReturnStmt(this.keyword,this.expr);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitReturnStmt(this);
+  }
+
+  
 }
 
 class VarDeclaration extends Statement

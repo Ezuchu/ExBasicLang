@@ -12,9 +12,12 @@ import '../value/ExBool.dart';
 import '../value/ExCallable.dart';
 import '../value/ExChar.dart';
 import '../value/ExDouble.dart';
+import '../value/ExFunction.dart';
 import '../value/ExInt.dart';
 import '../value/ExString.dart';
 import '../value/ExValue.dart';
+import '../value/ExVoid.dart';
+import 'Return.dart';
 import 'enviroment.dart';
 
 class Interpreter implements ExprVisitor,StmtVisitor{
@@ -104,6 +107,12 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     }
   }
 
+  @override
+  visitFunDeclaration(FunDeclaration stmt) {
+    ExFunction function = ExFunction(stmt);
+    enviroment.define(stmt.name, function);
+  }
+
   @override  
   visitIfStatement(IfStatement stmt) {
     if(isTruthy(evaluate(stmt.condition)))
@@ -120,6 +129,12 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     ExValue value = evaluate(stmt.expr);
 
     print(value);
+  }
+
+  @override
+  visitReturnStmt(ReturnStmt stmt) {
+    ExValue value = stmt.expr!=null? evaluate(stmt.expr!) : ExVoid(); 
+    throw Return(value);
   }
 
   @override

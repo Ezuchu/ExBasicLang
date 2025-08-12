@@ -13,7 +13,9 @@ enum ExType
 
   IDENTIFIER,
   ARRAY,
-  FUNCTION
+  FUNCTION,
+
+  VOID
 }
 
 Map<Tokentype,ExType> exTypeMap = {

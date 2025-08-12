@@ -1,4 +1,5 @@
 import '../AST/Expr.dart';
+import '../AST/Parameter.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../ExError.dart';
@@ -23,6 +24,7 @@ class Parser extends ParserBase
     if(match([Tokentype.FOR])) return forStmt();
     if(match([Tokentype.DO])) return doStmt();
     if(match([Tokentype.PRINT])) return printStmt();
+    if(match([Tokentype.RETURN])) return returnStmt();
 
     
 
@@ -31,7 +33,7 @@ class Parser extends ParserBase
       if(match([Tokentype.IDENTIFIER,Tokentype.LESS]))
       {
         current--;
-        return varDeclarationStmt();
+        return declarationStmt();
       }else
       {
         current--;
@@ -67,7 +69,6 @@ class Parser extends ParserBase
 
   Statement doStmt()
   {
-    Token start = previous();
 
     Statement body = statement();
 
@@ -154,18 +155,22 @@ class Parser extends ParserBase
     return Print(expr, reference);
   }
 
-  Statement varDeclarationStmt()
+  Statement declarationStmt()
   {
     ExType? type = exTypeMap[previous().type];
 
     TypeExpr variableType = typeExpression(type!);
-
 
     Expression? initializer;
 
     consume(Tokentype.IDENTIFIER, '');
 
     Token identifier = previous();
+
+    if(match([Tokentype.LEFT_PAREN]))
+    {
+      return funDeclaration(variableType,identifier);
+    }
 
     if(match([Tokentype.EQUAL]))
     {
@@ -175,6 +180,28 @@ class Parser extends ParserBase
     consume(Tokentype.SEMICOLON,"expected ';' after statement");
 
     return VarDeclaration(variableType, identifier, initializer);
+  }
+
+  Statement funDeclaration(TypeExpr returnType, Token identifier)
+  {
+    List<Parameter> parameters = getParameters(Tokentype.RIGHT_PAREN);
+
+    consume(Tokentype.LEFT_BRACE, "Expected '{' after parameters");
+    Statement body = blockStatement();
+
+    return FunDeclaration(identifier, parameters, body, returnType);
+  }
+
+  Statement returnStmt()
+  {
+    Token token = previous();
+
+    Expression? value = null;
+    if(!check(Tokentype.SEMICOLON)) value = expression();
+
+    consume(Tokentype.SEMICOLON, "Expect ';' after return value");
+
+    return ReturnStmt(token, value);
   }
 
   Statement whileStmt()
@@ -423,6 +450,25 @@ class Parser extends ParserBase
     return Array(elements, start);
   }
 
+  List<Parameter> getParameters(Tokentype terminator)
+  {
+    List<Parameter> parameters = [];
+
+    if(!check(terminator))
+    {
+      do
+      {
+        if(!match(types)) throw ExError(peek().line, peek().column, "Expected a parameter type", 2);
+        TypeExpr type = typeExpression(exTypeMap[previous().type]!);
+        Token name = consume(Tokentype.IDENTIFIER, "Expected a paramater name");
+        parameters.add(Parameter(name, type));
+      }while(match([Tokentype.COMMA]));
+    }
+    consume(terminator, "Expected the closure after parameters");
+
+    return parameters;
+  }
+
   void addStatementsTo(List<Statement> group)
   {
     while(!match([Tokentype.RIGHT_BRACE]))
@@ -431,6 +477,7 @@ class Parser extends ParserBase
 
       group.add(statement());
     }
+
   }
 
   TypeExpr typeExpression(ExType type)

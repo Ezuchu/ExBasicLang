@@ -10,6 +10,8 @@ enum Tokentype
     DO,
     UNTIL,
 
+    RETURN,
+
 
     LEFT_BRACE,
     RIGHT_BRACE,
@@ -92,6 +94,8 @@ Map<String, Tokentype> typeMap={
   "for" :Tokentype.FOR,
   "do" : Tokentype.DO,
   "until" : Tokentype.UNTIL,
+
+  "return" : Tokentype.RETURN,
 
   "TRUE": Tokentype.TRUE,
   "FALSE": Tokentype.FALSE,
