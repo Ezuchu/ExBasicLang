@@ -325,7 +325,7 @@ class Parser extends ParserBase
 
   Expression index()
   {
-    Expression expr = primary();
+    Expression expr = call();
 
     if(expr is Variable)
     {
@@ -338,6 +338,39 @@ class Parser extends ParserBase
       }
     }
     return expr;
+  }
+
+  Expression call()
+  {
+    Expression expr = primary();
+
+    while(true)
+    {
+      if(match([Tokentype.LEFT_PAREN]))
+      {
+        expr = finishCall(expr);
+      }else
+      {
+        break;
+      }
+    }
+    return expr;
+  }
+
+  Expression finishCall(Expression calee)
+  {
+    List<Expression> arguments = [];
+    if(!check(Tokentype.RIGHT_PAREN))
+    {
+      do
+      {
+        arguments.add(expression());
+      } while(match([Tokentype.COMMA]));
+    }
+
+    Token paren = consume(Tokentype.RIGHT_PAREN, "Expect ')' after arguments");
+
+    return Call(calee, paren, arguments);
   }
 
   Expression primary()

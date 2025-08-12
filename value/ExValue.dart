@@ -6,7 +6,7 @@ abstract class ExValue<R>
 {
   late ExType type;
 
-  ExValue(this.type);
+  
 
   @override
   String toString();

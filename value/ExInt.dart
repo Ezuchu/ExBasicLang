@@ -9,7 +9,10 @@ import 'ExValue.dart';
 class ExInt extends ExValue
 {
   int? value;
-  ExInt(this.value) : super(ExType.INT);
+  ExInt(this.value)
+  {
+    type = ExType.INT;
+  }
   
   @override
   String toString()

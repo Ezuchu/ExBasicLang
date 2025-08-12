@@ -9,11 +9,11 @@ enum ExType
   DOUBLE,
   CHAR,
   BOOL,
+  STRING,
 
-  STRING, 
   IDENTIFIER,
-
-  ARRAY
+  ARRAY,
+  FUNCTION
 }
 
 Map<Tokentype,ExType> exTypeMap = {

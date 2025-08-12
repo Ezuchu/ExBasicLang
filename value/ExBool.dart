@@ -7,7 +7,10 @@ class ExBool extends ExValue
 {
   bool? value;
 
-  ExBool(this.value):super(ExType.BOOL);
+  ExBool(this.value)
+  {
+    type = ExType.BOOL;
+  }
 
   @override
   String toString()

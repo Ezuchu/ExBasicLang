@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'Lexer/Lexer.dart';
 import 'Parser/Parser.dart';
-import 'runtime/interpreter.dart';
+import 'runtime/Interpreter.dart';
 
 
 

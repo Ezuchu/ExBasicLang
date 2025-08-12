@@ -1,9 +1,4 @@
 START
-    int a = 0;
-    do
-    {
-        print a;
-        a++;
-    }until(a == 7);
+    print clock();
 END
 

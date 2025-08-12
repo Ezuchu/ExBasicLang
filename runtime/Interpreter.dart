@@ -3,11 +3,13 @@ import '../AST/Expr.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../ExError.dart';
+import '../Natives/Clock.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import '../value/ExArray.dart';
 import '../value/ExArrayBase.dart';
 import '../value/ExBool.dart';
+import '../value/ExCallable.dart';
 import '../value/ExChar.dart';
 import '../value/ExDouble.dart';
 import '../value/ExInt.dart';
@@ -17,7 +19,14 @@ import 'enviroment.dart';
 
 class Interpreter implements ExprVisitor,StmtVisitor{
 
-  Enviroment enviroment = Enviroment(null);
+  Enviroment global = Enviroment(null);
+  late Enviroment enviroment;
+
+  Interpreter()
+  {
+    this.enviroment = global;
+    global.values["clock"] = Clock();
+  }
 
 
   void interprete(List<Statement> statements)
@@ -66,6 +75,18 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   @override
   void visitBlockStatement(BlockStatement stmt) {
     executeBlock(stmt.statements);
+  }
+
+  @override
+  visitCall(Call expr) {
+    ExValue callee = evaluate(expr.calee);
+    List<ExValue> arguments = expr.arguments.map((arg)=> evaluate(arg)).toList();
+
+    if(!(callee is ExCallable)) throw ExError(expr.paren.line, expr.paren.column, "The expression is not a valid callable", 3);
+
+    ExCallable function = callee as ExCallable;
+
+    return function.call(this, arguments);
   }
 
   @override  

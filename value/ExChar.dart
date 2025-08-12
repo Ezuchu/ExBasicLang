@@ -8,9 +8,9 @@ class ExChar extends ExValue
 {
   String? value;
 
-  ExChar(String? value) : super(ExType.CHAR)
+  ExChar(this.value)
   {
-    this.value = value;
+    type = ExType.CHAR;
   }
 
   @override

@@ -10,6 +10,7 @@ abstract class ExprVisitor<R>
 {
   R visitArray(Array expr);
   R visitAssignment(Assignment expr);
+  R visitCall(Call expr);
   R visitBinary(Binary expr);
   R visitGroup(Group expr);
   R visitIndex(Index expr);
@@ -73,6 +74,20 @@ class Binary extends Expression
   @override
   String toString() {
     return "$left ${operand.lexeme} $right";
+  }
+}
+
+class Call extends Expression
+{
+  final Expression calee;
+  final Token paren;
+  final List<Expression> arguments;
+
+  Call(this.calee,this.paren,this.arguments);
+  
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitCall(this);
   }
 }
 

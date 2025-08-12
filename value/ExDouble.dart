@@ -10,7 +10,10 @@ import 'ExValue.dart';
 class ExDouble extends ExValue
 {
   double? value;
-  ExDouble(this.value) : super(ExType.DOUBLE);
+  ExDouble(this.value)
+  {
+    type = ExType.DOUBLE;
+  }
   
   @override
   String toString()
