@@ -15,16 +15,17 @@ import 'ExVoid.dart';
 class ExFunction extends ExValue implements ExCallable
 {
   final FunDeclaration declaration;
+  final Enviroment closure;
   
 
-  ExFunction(this.declaration)
+  ExFunction(this.declaration,this.closure)
   {
     type = ExType.FUNCTION;
   }
 
   @override
   ExValue call(Interpreter interpreter, List<ExValue> arguments) {
-    Enviroment enviroment = Enviroment(interpreter.global);
+    Enviroment enviroment = Enviroment(closure);
     declaration.parameters.forEach((p) => enviroment.define(p.name, arguments[declaration.parameters.indexOf(p)]));
 
     Enviroment aux = interpreter.enviroment;

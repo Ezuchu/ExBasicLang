@@ -109,7 +109,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override
   visitFunDeclaration(FunDeclaration stmt) {
-    ExFunction function = ExFunction(stmt);
+    ExFunction function = ExFunction(stmt,enviroment);
     enviroment.define(stmt.name, function);
   }
 
