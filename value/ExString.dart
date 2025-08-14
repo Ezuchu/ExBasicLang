@@ -34,11 +34,9 @@ class ExString extends ExArrayBase implements ExValue
 
   @override
   set(ExValue value, Token token) {
-
     if(!(value is ExString)) throw ExError(token.line, token.column, "incompatible types in assignment",3);
 
-
-    elements = (value.getValue()).split("").map((c) => ExChar(c)).toList();
+    elements = (value.getValue() as String).split("").map((c) => ExChar(c)).toList();
   }
 
   @override

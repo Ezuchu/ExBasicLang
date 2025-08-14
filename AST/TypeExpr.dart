@@ -25,7 +25,8 @@ Map<Tokentype,ExType> exTypeMap = {
   Tokentype.BOOLEAN_TYPE : ExType.BOOL,
   Tokentype.STRING_TYPE : ExType.STRING,
   Tokentype.ARRAY_TYPE : ExType.ARRAY,
-  Tokentype.IDENTIFIER : ExType.IDENTIFIER
+  Tokentype.IDENTIFIER : ExType.IDENTIFIER,
+  Tokentype.VOID_TYPE : ExType.VOID
 };
 
 class TypeExpr 

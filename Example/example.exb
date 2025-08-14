@@ -1,9 +1,12 @@
-int sum(int a,int b){
-    return a+b;
+
+string a = "caja";
+
+{
+    void fun(){
+        print a;
+    }
+
+    fun();
+    string a = "cajon";
+    fun();
 }
-
-START
-    int caja = sum(5,7);
-    print caja;
-END
-

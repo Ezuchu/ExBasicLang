@@ -1,4 +1,6 @@
 
+import 'dart:collection';
+
 import '../AST/Expr.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
@@ -24,6 +26,8 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   Enviroment global = Enviroment(null);
   late Enviroment enviroment;
+
+  final HashMap<Expression,int> locals = HashMap<Expression,int>();
 
   Interpreter()
   {
@@ -60,6 +64,10 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   ExValue evaluate(Expression expr)
   {
     return expr.accept(this);
+  }
+
+  void resolve(Expression expr, int depth){
+    locals[expr]=depth;
   }
 
   
@@ -370,7 +378,16 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   @override
   ExValue visitVariable(Variable expr)
   {
-    return enviroment.get(expr.name);
+    return lookUpVariable(expr.name, expr);
+  }
+
+  ExValue lookUpVariable(Token name, Expression expr){
+    if(locals.containsKey(expr)){
+      int distance = locals[expr]!;
+      return enviroment.getAt(distance,name);
+    }else{
+      return global.get(name);
+    }
   }
 
   ExType? arrayContentType(List<ExValue> elements)
@@ -403,8 +420,9 @@ class Interpreter implements ExprVisitor,StmtVisitor{
         return ExInt(5);
     }
 
+    
     if(value != null) initial.set(value,name);
-
+    
     return initial;
     
   }

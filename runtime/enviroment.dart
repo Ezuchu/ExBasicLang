@@ -29,4 +29,18 @@ class Enviroment
     {
       values[identifier.lexeme] = value;
     }
+
+    ExValue getAt(int distance, Token name){
+      return ancestor(distance).get(name);
+    }
+
+    Enviroment ancestor(int distance){
+      Enviroment env = this;
+
+      for(int i = 0; i < distance;i++){
+        env = env.enclosing!;
+      }
+
+      return env;
+    }
  }

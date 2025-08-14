@@ -65,12 +65,12 @@ enum Tokentype
     DOUBLE_TYPE,
     BOOLEAN_TYPE,
     ARRAY_TYPE,
+    VOID_TYPE,
 
     PRINT,
     
 
     EOF,
-
 
 }
 
@@ -81,7 +81,8 @@ List<Tokentype> types = [
   Tokentype.CHAR_TYPE,
   Tokentype.STRING_TYPE,
   Tokentype.ARRAY_TYPE,
-  Tokentype.IDENTIFIER];
+  Tokentype.IDENTIFIER,
+  Tokentype.VOID_TYPE];
 
 Map<String, Tokentype> typeMap={
 
@@ -106,6 +107,7 @@ Map<String, Tokentype> typeMap={
   "double":Tokentype.DOUBLE_TYPE,
   "bool":Tokentype.BOOLEAN_TYPE,
   "Array":Tokentype.ARRAY_TYPE,
+  "void": Tokentype.VOID_TYPE,
 
   "print":Tokentype.PRINT
 };
