@@ -492,6 +492,7 @@ class Parser extends ParserBase
 
   TypeExpr arrayTypeExpression()
   {
+    int? literal;
     consume(Tokentype.LESS, "Expected '<'");
     if(!match(types))
     {
@@ -503,6 +504,9 @@ class Parser extends ParserBase
     Expression dimension = or();
     consume(Tokentype.RIGHT_BRACKET, "Expected ']'");
     consume(Tokentype.GREATER, "Expected '>'");
-    return ArrayType(itemTypeExpr,dimension);
+    if(dimension is Literal){
+      if(dimension.type == ExType.INT) literal = dimension.value as int;
+    }
+    return ArrayType(itemTypeExpr,dimension,literal);
   }
 }

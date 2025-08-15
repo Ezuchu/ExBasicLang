@@ -2,6 +2,7 @@
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import 'Expr.dart';
+import 'Parameter.dart';
 
 enum ExType
 {
@@ -14,6 +15,7 @@ enum ExType
   IDENTIFIER,
   ARRAY,
   FUNCTION,
+  ANY,
 
   VOID
 }
@@ -41,6 +43,11 @@ class TypeExpr
 
     return super == other;
   }
+
+  @override
+  String toString() {
+    return "$type";
+  }
 }
 
 class IdentifierType extends TypeExpr
@@ -54,9 +61,34 @@ class ArrayType extends TypeExpr
 {
   TypeExpr itemType;
   Expression dimensionExpr;
+  int? literalDim;
 
-  ArrayType(this.itemType,this.dimensionExpr):super(ExType.ARRAY);
+  ArrayType(this.itemType,this.dimensionExpr,this.literalDim):super(ExType.ARRAY);
+
+  @override
+  bool operator ==(Object other) {
+    if(!(other is ArrayType)) return  false;
+    
+    print(itemType);
+    print(other.itemType);
+    if(itemType != other.itemType) return false;
+    
+
+    if(literalDim != null && other.literalDim !=null){
+      if(literalDim != other.literalDim) return false;
+    }
+
+    return true;
+  }
 
   
+}
+
+class FunctionTypeExpr extends TypeExpr{
+  final String name;
+  final List<TypeExpr> parameters;
+  final TypeExpr returnType;
+
+  FunctionTypeExpr(this.name,this.parameters,this.returnType) : super(ExType.FUNCTION);
 }
 

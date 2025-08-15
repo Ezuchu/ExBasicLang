@@ -1,12 +1,10 @@
 
-string a = "caja";
+int fun(int a, int b){
+    return a+b;
+}
+
 
 {
-    void fun(){
-        print a;
-    }
-
-    fun();
-    string a = "cajon";
-    fun();
+    int caja = fun(5,7);
+    print caja;
 }

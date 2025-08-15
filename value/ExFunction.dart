@@ -26,7 +26,7 @@ class ExFunction extends ExValue implements ExCallable
   @override
   ExValue call(Interpreter interpreter, List<ExValue> arguments) {
     Enviroment enviroment = Enviroment(closure);
-    declaration.parameters.forEach((p) => enviroment.define(p.name, arguments[declaration.parameters.indexOf(p)]));
+    declaration.parameters.forEach((p) => enviroment.define(p.name, arguments[declaration.parameters.indexOf(p)].copy()));
 
     Enviroment aux = interpreter.enviroment;
     interpreter.enviroment = enviroment;
