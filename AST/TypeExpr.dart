@@ -17,6 +17,9 @@ enum ExType
   FUNCTION,
   ANY,
 
+  STRUCT,
+  STRUCT_INSTANCE,
+
   VOID
 }
 
@@ -28,7 +31,8 @@ Map<Tokentype,ExType> exTypeMap = {
   Tokentype.STRING_TYPE : ExType.STRING,
   Tokentype.ARRAY_TYPE : ExType.ARRAY,
   Tokentype.IDENTIFIER : ExType.IDENTIFIER,
-  Tokentype.VOID_TYPE : ExType.VOID
+  Tokentype.VOID_TYPE : ExType.VOID,
+  Tokentype.STRUCT : ExType.STRUCT
 };
 
 class TypeExpr 
@@ -55,6 +59,14 @@ class IdentifierType extends TypeExpr
   Token identifier;
 
   IdentifierType(ExType type,this.identifier):super(type);
+
+  @override
+  bool operator ==(Object other) {
+    if(other is IdentifierType){
+      return identifier.lexeme == identifier.lexeme;
+    }
+    return this==other;
+  }
 }
 
 class ArrayType extends TypeExpr
@@ -90,5 +102,17 @@ class FunctionTypeExpr extends TypeExpr{
   final TypeExpr returnType;
 
   FunctionTypeExpr(this.name,this.parameters,this.returnType) : super(ExType.FUNCTION);
+}
+
+class StructTypeExpr extends TypeExpr{
+  final String name;
+  final Map<String,TypeExpr> fields = Map<String,TypeExpr>();
+
+  StructTypeExpr(this.name,List<Parameter> fields):super(ExType.STRUCT)
+  {
+    for(Parameter field in fields){
+      this.fields[field.name.lexeme] = field.type;
+    }
+  }
 }
 

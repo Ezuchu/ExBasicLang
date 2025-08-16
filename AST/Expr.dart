@@ -12,6 +12,7 @@ abstract class ExprVisitor<R>
   R visitAssignment(Assignment expr);
   R visitCall(Call expr);
   R visitBinary(Binary expr);
+  R visitGetExpr(GetExpr expr);
   R visitGroup(Group expr);
   R visitIndex(Index expr);
   R visitLiteral(Literal expr);
@@ -88,6 +89,18 @@ class Call extends Expression
   @override
   R accept<R>(ExprVisitor visitor) {
     return visitor.visitCall(this);
+  }
+}
+
+class GetExpr extends Expression{
+  final Expression object;
+  final Token name;
+
+  GetExpr(this.object,this.name);
+  
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitGetExpr(this);
   }
 }
 

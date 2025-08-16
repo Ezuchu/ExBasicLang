@@ -25,6 +25,7 @@ class Parser extends ParserBase
     if(match([Tokentype.DO])) return doStmt();
     if(match([Tokentype.PRINT])) return printStmt();
     if(match([Tokentype.RETURN])) return returnStmt();
+    if(match([Tokentype.STRUCT])) return structStmt();
 
     
 
@@ -204,6 +205,14 @@ class Parser extends ParserBase
     return ReturnStmt(token, value);
   }
 
+  Statement structStmt(){
+    Token name = consume(Tokentype.IDENTIFIER, "Expected a struct type identifier");
+    consume(Tokentype.LEFT_BRACE, "expected '{' after identifier");
+    List<Parameter> params = getParameters(Tokentype.RIGHT_BRACE);
+
+    return StructStmt(name, params);
+  }
+
   Statement whileStmt()
   {
     Token start = previous();
@@ -233,7 +242,7 @@ class Parser extends ParserBase
       Token reference = previous();
       Expression value = or();
 
-      if(expr is Variable || expr is Index)
+      if(expr is Variable || expr is Index || expr is GetExpr)
       {
         return Assignment(expr,value,reference);
       }
@@ -376,6 +385,10 @@ class Parser extends ParserBase
       if(match([Tokentype.LEFT_PAREN]))
       {
         expr = finishCall(expr);
+      }else if(match([Tokentype.DOT]))
+      {
+        Token name = consume(Tokentype.IDENTIFIER, "Expect property name after '.'.");
+        expr = GetExpr(expr, name);
       }else
       {
         break;
@@ -485,6 +498,7 @@ class Parser extends ParserBase
     switch(type)
     {
       case ExType.ARRAY:return arrayTypeExpression();
+      case ExType.IDENTIFIER : return IdentifierType(type, previous());
       default:
         return TypeExpr(type);
     }

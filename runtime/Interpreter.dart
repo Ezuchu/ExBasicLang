@@ -2,6 +2,7 @@
 import 'dart:collection';
 
 import '../AST/Expr.dart';
+import '../AST/Parameter.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../ExError.dart';
@@ -17,6 +18,8 @@ import '../value/ExDouble.dart';
 import '../value/ExFunction.dart';
 import '../value/ExInt.dart';
 import '../value/ExString.dart';
+import '../value/ExStruct.dart';
+import '../value/ExStructInstance.dart';
 import '../value/ExValue.dart';
 import '../value/ExVoid.dart';
 import 'Return.dart';
@@ -145,6 +148,12 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     throw Return(value);
   }
 
+  @override  
+  visitStructStmr(StructStmt stmt) {
+    ExStruct struct = ExStruct(stmt.name.lexeme, stmt.params);
+    enviroment.define(stmt.name, struct);
+  }
+
   @override
   visitVarDeclaration(VarDeclaration stmt) {
     Token identifier = stmt.identifier;
@@ -269,6 +278,15 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       default:
         throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid binary operator', 3);
     }
+  }
+
+  @override  
+  ExValue visitGetExpr(GetExpr expr){
+    ExValue root = evaluate(expr.object);
+    if(root is ExStructInstance){
+      return root.getItem(expr.name);
+    }
+    throw ExError(expr.name.line, expr.name.column, "The variable is not a instance", 3);
   }
 
   @override
@@ -416,11 +434,11 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       case ExType.BOOL : initial = ExBool(null);break;
       case ExType.STRING : initial = ExString();break;
       case ExType.ARRAY : initial = decArray(type as ArrayType, name);break;
+      case ExType.IDENTIFIER : initial = decInstance(type as IdentifierType,name);break;
       default:
         return ExInt(5);
     }
 
-    
     if(value != null) initial.set(value,name);
     
     return initial;
@@ -436,6 +454,22 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
 
     return ExArray(items, type.itemType.type, dimension.getValue());
+  }
+
+  ExValue decInstance(IdentifierType type, Token name){
+    ExValue structure = global.get(type.identifier);
+    if(structure is ExStruct){
+      return decStructInstance(structure,name);
+    }
+    throw ExError(name.line, name.column, "The variable doesn't have a valid type", 3);
+  }
+
+  ExValue decStructInstance(ExStruct dec, Token name){
+    Map<String,ExValue> fields = Map<String,ExValue>();
+    for(Parameter param in dec.fieldsName){
+      fields[param.name.lexeme] = defineValue(name, param.type, null);
+    }
+    return ExStructInstance(dec, fields);
   }
 
   ExValue createNumber(num value)

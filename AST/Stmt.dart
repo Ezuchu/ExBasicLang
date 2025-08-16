@@ -18,6 +18,7 @@ abstract class StmtVisitor<R>
   R visitExpressionStmt(ExpressionStmt stmt);
   R visitIfStatement(IfStatement stmt);
   R visitReturnStmt(ReturnStmt stmt);
+  R visitStructStmr(StructStmt stmt);
   R visitVarDeclaration(VarDeclaration stmt);
   R visitWhileStatement(WhileStatement stmt);
 }
@@ -132,7 +133,18 @@ class ReturnStmt extends Statement
     return visitor.visitReturnStmt(this);
   }
 
+}
+
+class StructStmt extends Statement{
+  final Token name;
+  final List<Parameter> params;
+
+  StructStmt(this.name,this.params);
   
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitStructStmr(this);
+  }
 }
 
 class VarDeclaration extends Statement

@@ -8,6 +8,7 @@ import '../ExError.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import '../runtime/Interpreter.dart';
+import '../value/ExValue.dart';
 
 
 enum FunctionType{
@@ -166,6 +167,16 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   @override  
+  visitStructStmr(StructStmt stmt) {
+    if(scopes.isNotEmpty) throw ExError(stmt.name.line, stmt.name.column, "can't declare a struct in a local scope", 3);
+    
+    TypeExpr type = StructTypeExpr(stmt.name.lexeme, stmt.params);
+    declare(stmt.name, type);
+    define(stmt.name);
+
+  }
+
+  @override  
   visitVarDeclaration(VarDeclaration stmt) {
     declare(stmt.identifier,stmt.type);
     if(stmt.initializer !=null){
@@ -282,6 +293,24 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   @override
+  visitGetExpr(GetExpr expr) {
+    TypeExpr root = resolveExpr(expr.object);
+    if(!(root is IdentifierType)){
+      throw ExError(expr.name.line, expr.name.column, "Only instances have properties", 3);
+    }
+    TypeExpr type = resolveLocal(expr.object, root.identifier);
+
+    if(isStruct(type)){
+      if((type as StructTypeExpr).fields.containsKey(expr.name.lexeme)){
+        type = type.fields[expr.name.lexeme]!;
+      }
+    }
+    
+
+    return type;
+  }
+
+  @override
   TypeExpr visitGroup(Group expr) {
     return resolveExpr(expr.expr);
   }
@@ -334,7 +363,6 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   @override  
   TypeExpr visitVariable(Variable expr) {
-    print(expr.name.lexeme);
     if(!scopes.isEmpty && scopes.last.containsKey(expr.name.lexeme) && scopes.last[expr.name.lexeme]!.state == false){
       throw ExError(expr.name.line, expr.name.column, "Can't read local variable in its own initializer", 3);
     }
@@ -354,6 +382,10 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   bool isInt(TypeExpr type){
     return type.type == ExType.INT;
+  }
+
+  bool isStruct(TypeExpr type){
+    return type.type == ExType.STRUCT;
   }
 
 }
