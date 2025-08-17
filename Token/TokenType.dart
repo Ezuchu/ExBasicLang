@@ -67,6 +67,8 @@ enum Tokentype
     ARRAY_TYPE,
     VOID_TYPE,
 
+    THIS,
+
     STRUCT,
     CLASS,
 
@@ -111,6 +113,8 @@ Map<String, Tokentype> typeMap={
   "bool":Tokentype.BOOLEAN_TYPE,
   "Array":Tokentype.ARRAY_TYPE,
   "void": Tokentype.VOID_TYPE,
+
+  "this": Tokentype.THIS,
 
   "struct" : Tokentype.STRUCT,
   "class" : Tokentype.CLASS,

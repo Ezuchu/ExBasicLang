@@ -18,6 +18,7 @@ abstract class ExprVisitor<R>
   R visitLiteral(Literal expr);
   R visitLogical(Logical expr);
   R visitPostFix(PostFix expr);
+  R visitThisExpr(ThisExpr expr);
   R visitVariable(Variable expr);
   R visitUnary(Unary expr);
 }
@@ -189,6 +190,18 @@ class PostFix extends Expression
   @override
   R accept<R>(ExprVisitor visitor) {
     return visitor.visitPostFix(this);
+  }
+}
+
+class ThisExpr extends Expression
+{
+  final Token keyword;
+
+  ThisExpr(this.keyword);
+
+  @override
+  R accept<R>(ExprVisitor visitor) {
+    return visitor.visitThisExpr(this);
   }
 }
 

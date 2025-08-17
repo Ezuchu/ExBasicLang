@@ -456,6 +456,8 @@ class Parser extends ParserBase
       return Group(expr);
     }
 
+    if(match([Tokentype.THIS])) return ThisExpr(previous());
+
     if(match([Tokentype.IDENTIFIER]))
     {
       return Variable(previous());

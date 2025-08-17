@@ -18,7 +18,7 @@ class ExClassInstance extends ExValue{
     if(fields.containsKey(name.lexeme)){
       return fields[name.lexeme]!;
     }
-    return klass.methods[name.lexeme]!;
+    return klass.methods[name.lexeme]!.bind(this);
   }
 
   @override

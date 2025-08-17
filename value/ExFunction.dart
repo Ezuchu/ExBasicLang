@@ -9,6 +9,7 @@ import '../runtime/Return.dart';
 import '../runtime/enviroment.dart';
 import 'ExBool.dart';
 import 'ExCallable.dart';
+import 'ExClassInstance.dart';
 import 'ExValue.dart';
 import 'ExVoid.dart';
 
@@ -47,6 +48,12 @@ class ExFunction extends ExValue implements ExCallable
     interpreter.enviroment = aux;
 
     return returnValue;
+  }
+
+  ExFunction bind(ExClassInstance instance){
+    Enviroment env = Enviroment(this.closure);
+    env.values["this"] = instance;
+    return ExFunction(this.declaration, env);
   }
 
   @override

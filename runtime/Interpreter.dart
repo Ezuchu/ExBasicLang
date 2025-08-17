@@ -386,6 +386,11 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return copy;
   }
 
+  @override  
+  ExValue visitThisExpr(ThisExpr expr){
+    return lookUpVariable(expr.keyword, expr);
+  }
+
   @override
   ExValue visitUnary(Unary expr) {
     ExValue right = evaluate(expr.expr);

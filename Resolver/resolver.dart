@@ -8,12 +8,12 @@ import '../ExError.dart';
 import '../Token/Token.dart';
 import '../Token/TokenType.dart';
 import '../runtime/Interpreter.dart';
-import '../value/ExValue.dart';
 
 
 enum FunctionType{
   NONE,
-  FUNCTION
+  FUNCTION,
+  METHOD
 }
 
 
@@ -82,7 +82,7 @@ class Resolver implements ExprVisitor,StmtVisitor
     return global[name.lexeme]!.type;
   }
 
-  void resolveFuntion(FunDeclaration fun,FunctionType type){
+  void resolveFunction(FunDeclaration fun,FunctionType type){
     Map<String,ExSymbol> scope = scopes.isEmpty? global : scopes.last;
 
     FunctionType enclosingFunction = currentFunction;
@@ -95,8 +95,8 @@ class Resolver implements ExprVisitor,StmtVisitor
       declare(param.name,param.type);
       define(param.name);
     }
-
     resolve(fun.body);
+    
     endScope();
     currentFunction = enclosingFunction;
     currentType = enclosingType;
@@ -112,14 +112,16 @@ class Resolver implements ExprVisitor,StmtVisitor
   @override
   visitClassStmt(ClassStmt stmt) {
     if(scopes.isNotEmpty) throw ExError(stmt.name.line, stmt.name.column, "can't declare a class in a local scope", 3);
-    TypeExpr type = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods);
-    declare(stmt.name, type);
+    TypeExpr klass = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods);
+    declare(stmt.name, klass);
     define(stmt.name);
 
     beginScope();
 
+    scopes.last["this"] = ExSymbol("this", true, ClassTypeInstance(klass as ClassTypeExpr));
+
     for(FunDeclaration method in stmt.methods){
-      resolve(method);
+      visitFunDeclaration(method,funType: FunctionType.METHOD);
     }
 
     endScope();
@@ -137,12 +139,11 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   @override  
-  visitFunDeclaration(FunDeclaration stmt) {
+  visitFunDeclaration(FunDeclaration stmt, {FunctionType funType = FunctionType.FUNCTION}) {
     TypeExpr type = FunctionTypeExpr(stmt.name.lexeme, stmt.parameters.map((p)=>p.type).toList(), stmt.returnType);
     declare(stmt.name,type);
     define(stmt.name);
-
-    resolveFuntion(stmt,FunctionType.FUNCTION);
+    resolveFunction(stmt,funType);
   }
 
   @override  
@@ -195,7 +196,6 @@ class Resolver implements ExprVisitor,StmtVisitor
   @override  
   visitVarDeclaration(VarDeclaration stmt) {
     TypeExpr type = resolveType(stmt.type);
-
     declare(stmt.identifier,type);
     if(stmt.initializer !=null){
       TypeExpr initType = resolveExpr(stmt.initializer!);
@@ -365,8 +365,8 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   @override
-  visitPostFix(PostFix expr) {
-    resolveExpr(expr.operand);
+  TypeExpr visitPostFix(PostFix expr) {
+    return resolveExpr(expr.operand);
   }
 
   @override  
@@ -385,14 +385,16 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   @override  
+  TypeExpr visitThisExpr(ThisExpr expr){
+    return resolveLocal(expr, expr.keyword);
+  }
+
+  @override  
   TypeExpr visitVariable(Variable expr) {
     if(!scopes.isEmpty && scopes.last.containsKey(expr.name.lexeme) && scopes.last[expr.name.lexeme]!.state == false){
       throw ExError(expr.name.line, expr.name.column, "Can't read local variable in its own initializer", 3);
     }
-    
-
     return resolveLocal(expr,expr.name);
-
   }
 
   TypeExpr resolveType(TypeExpr originType){
