@@ -10,7 +10,7 @@ class ExStructInstance extends ExValue{
   ExType type = ExType.STRUCT_INSTANCE;
 
   final ExStruct struct;
-  final Map<String,ExValue?> values;
+  late Map<String,ExValue?> values;
 
 
   ExStructInstance(this.struct,this.values);
@@ -38,8 +38,9 @@ class ExStructInstance extends ExValue{
 
   @override
   set(ExValue value, Token token) {
-    // TODO: implement set
-    throw UnimplementedError();
+    if(value is ExStructInstance && value.struct == this.struct){
+      this.values = value.values;
+    }
   }
 
   @override

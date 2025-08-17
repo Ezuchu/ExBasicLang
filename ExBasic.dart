@@ -21,8 +21,9 @@ void main()
       Interpreter interpreter = Interpreter();
       Resolver resolver = Resolver(interpreter);
       resolver.resolveList(statements);
-      
       interpreter.interprete(statements);
+
+      
     }catch(e)
     {
       print(e);

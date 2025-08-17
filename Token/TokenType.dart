@@ -68,6 +68,7 @@ enum Tokentype
     VOID_TYPE,
 
     STRUCT,
+    CLASS,
 
     PRINT,
     
@@ -112,6 +113,7 @@ Map<String, Tokentype> typeMap={
   "void": Tokentype.VOID_TYPE,
 
   "struct" : Tokentype.STRUCT,
+  "class" : Tokentype.CLASS,
 
   "print":Tokentype.PRINT
 };

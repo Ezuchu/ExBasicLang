@@ -1,13 +1,19 @@
 
-struct Cajon{
-    int tula,
-    double tala
+class calc{
+    int a;
+    int b;
+
+    int sum(int e, int c){
+        return e+c;
+    }
 }
 
 {
-    Cajon caja;
-    caja.tula = 1;
-    caja.tala = 2.7;
-    print caja.tula;
-    print caja.tala;
+    calc inst = calc();
+    inst.a = 5;
+    inst.b = 7;
+
+    print(inst.a);
+    print(inst.b);
+    print(inst.sum(5,7));
 }

@@ -26,6 +26,7 @@ class Parser extends ParserBase
     if(match([Tokentype.PRINT])) return printStmt();
     if(match([Tokentype.RETURN])) return returnStmt();
     if(match([Tokentype.STRUCT])) return structStmt();
+    if(match([Tokentype.CLASS])) return classStmt();
 
     
 
@@ -66,6 +67,26 @@ class Parser extends ParserBase
     addStatementsTo(statements);
 
     return BlockStatement(statements);
+  }
+
+  Statement classStmt(){
+    Token name = consume(Tokentype.IDENTIFIER, "Expected class name");
+    consume(Tokentype.LEFT_BRACE, "Expected '{' after class name");
+    List<FunDeclaration> methods = [];
+    List<Parameter> attributes = [];
+
+    while(match(types)){
+      Statement property =declarationStmt();
+      if(property is FunDeclaration){
+        methods.add(property);
+      }else if(property is VarDeclaration)
+      {
+        attributes.add(Parameter(property.identifier, property.type));
+      }
+    }
+    consume(Tokentype.RIGHT_BRACE, "Expected '}' to close class declaration");
+
+    return ClassStmt(name, attributes,methods);
   }
 
   Statement doStmt()

@@ -109,6 +109,22 @@ class Resolver implements ExprVisitor,StmtVisitor
     endScope();
   }
 
+  @override
+  visitClassStmt(ClassStmt stmt) {
+    if(scopes.isNotEmpty) throw ExError(stmt.name.line, stmt.name.column, "can't declare a class in a local scope", 3);
+    TypeExpr type = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods);
+    declare(stmt.name, type);
+    define(stmt.name);
+
+    beginScope();
+
+    for(FunDeclaration method in stmt.methods){
+      resolve(method);
+    }
+
+    endScope();
+  }
+
   @override  
   visitDoStmt(DoStmt stmt) {
     resolve(stmt.body);
@@ -178,11 +194,12 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   @override  
   visitVarDeclaration(VarDeclaration stmt) {
-    declare(stmt.identifier,stmt.type);
+    TypeExpr type = resolveType(stmt.type);
+
+    declare(stmt.identifier,type);
     if(stmt.initializer !=null){
       TypeExpr initType = resolveExpr(stmt.initializer!);
-      
-      if(stmt.type != initType){
+      if(type != initType){
         if(!(isDouble(stmt.type) && isInt(initType))){
           throw ExError(stmt.identifier.line, stmt.identifier.column, "Incompatible type for initializer", 3);
         }
@@ -279,33 +296,39 @@ class Resolver implements ExprVisitor,StmtVisitor
   @override  
   TypeExpr visitCall(Call expr) {
     TypeExpr calleType = resolveExpr(expr.calee);
-    if(!(calleType is FunctionTypeExpr)) throw ExError(expr.paren.line, expr.paren.column, "the callee is not a valid function", 3);
+    if(!isCallable(calleType)) throw ExError(expr.paren.line, expr.paren.column, "the callee is not a valid function", 3);
     int index = 0;
-    for(Expression arg in expr.arguments){
-      TypeExpr argType = resolveExpr(arg);
-      if(calleType.parameters[index] != argType){
-        if(calleType.parameters[index].type != ExType.DOUBLE || argType.type != ExType.INT){
-          throw ExError(expr.paren.line, expr.paren.column, "a parameter is incompatible with the function parameter", 3); 
+    if(calleType is FunctionTypeExpr){
+      for(Expression arg in expr.arguments){
+        TypeExpr argType = resolveExpr(arg);
+        if(calleType.parameters[index] != argType){
+          if(calleType.parameters[index].type != ExType.DOUBLE || argType.type != ExType.INT){
+            throw ExError(expr.paren.line, expr.paren.column, "a parameter is incompatible with the function parameter", 3); 
+          }
         }
       }
+      return calleType.returnType;
     }
-    return calleType.returnType;
+    
+    return ClassTypeInstance(calleType as ClassTypeExpr);
+    
   }
 
   @override
   visitGetExpr(GetExpr expr) {
     TypeExpr root = resolveExpr(expr.object);
-    if(!(root is IdentifierType)){
+    if(!isInstance(root)){
       throw ExError(expr.name.line, expr.name.column, "Only instances have properties", 3);
     }
-    TypeExpr type = resolveLocal(expr.object, root.identifier);
 
-    if(isStruct(type)){
-      if((type as StructTypeExpr).fields.containsKey(expr.name.lexeme)){
-        type = type.fields[expr.name.lexeme]!;
-      }
+    TypeExpr type = TypeExpr(ExType.VOID);
+
+    if(root is StructTypeInstance){
+      type = resolveStructGet(expr.name,root.struct);
     }
-    
+    if(root is ClassTypeInstance){
+      type = resolveClassGet(expr.name,root.klass);
+    }
 
     return type;
   }
@@ -372,6 +395,38 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   }
 
+  TypeExpr resolveType(TypeExpr originType){
+    if(primitives.contains(originType.type)) return originType;
+    if(originType is ArrayType){
+      return ArrayType(resolveType(originType.itemType), originType.dimensionExpr, originType.literalDim);
+    }
+    TypeExpr type = visitVariable(Variable((originType as  IdentifierType).identifier));
+    if(type is StructTypeExpr){
+      return StructTypeInstance(type);
+    }
+    if(type is ClassTypeExpr){
+      return ClassTypeInstance(type);
+    }
+    return originType;
+  }
+
+  TypeExpr resolveStructGet(Token name, StructTypeExpr struct){
+    if(!struct.fields.containsKey(name.lexeme)){
+      throw ExError(name.line, name.column, "The struct type doesn't have that field", 3);
+    }
+    return struct.fields[name.lexeme]!;
+  }
+
+  TypeExpr resolveClassGet(Token name, ClassTypeExpr klass){
+    if(!klass.fields.containsKey(name.lexeme)){
+      if(!klass.methods.containsKey(name.lexeme)){
+        throw ExError(name.line, name.column, "The class type doesn't have that field", 3);
+      }
+      return klass.methods[name.lexeme]!;
+    }
+    return klass.fields[name.lexeme]!;
+  }
+
   bool isNumber(TypeExpr type){
     return (type.type == ExType.INT || type.type == ExType.DOUBLE);
   }
@@ -386,6 +441,14 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   bool isStruct(TypeExpr type){
     return type.type == ExType.STRUCT;
+  }
+
+  bool isInstance(TypeExpr type){
+    return (type is StructTypeInstance || type is ClassTypeInstance);
+  }
+
+  bool isCallable(TypeExpr type){
+    return (type is FunctionTypeExpr || type is ClassTypeExpr);
   }
 
 }

@@ -14,6 +14,8 @@ import '../value/ExArrayBase.dart';
 import '../value/ExBool.dart';
 import '../value/ExCallable.dart';
 import '../value/ExChar.dart';
+import '../value/ExClass.dart';
+import '../value/ExClassInstance.dart';
 import '../value/ExDouble.dart';
 import '../value/ExFunction.dart';
 import '../value/ExInt.dart';
@@ -103,6 +105,13 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     return function.call(this, arguments);
   }
 
+  @override
+  visitClassStmt(ClassStmt stmt) {
+    enviroment.define(stmt.name, ExVoid());
+    ExClass klass = ExClass(stmt.name.lexeme, enviroment, stmt.attributes, stmt.methods);
+    enviroment.values[stmt.name.lexeme] = klass;
+  }
+
   @override  
   visitExpressionStmt(ExpressionStmt stmt) {
     evaluate(stmt.expr);
@@ -160,6 +169,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
     ExValue? value = stmt.initializer == null? null : this.evaluate(stmt.initializer!);
     
+    
     ExValue initial = defineValue(stmt.identifier,stmt.type,value);
 
     enviroment.define(identifier, initial);
@@ -175,6 +185,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     
     Token reference = expr.reference;
     ExValue variable = evaluate(expr.name);
+    
     ExValue newValue = evaluate(expr.value);
 
     
@@ -284,6 +295,9 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   ExValue visitGetExpr(GetExpr expr){
     ExValue root = evaluate(expr.object);
     if(root is ExStructInstance){
+      return root.getItem(expr.name);
+    }
+    if(root is ExClassInstance){
       return root.getItem(expr.name);
     }
     throw ExError(expr.name.line, expr.name.column, "The variable is not a instance", 3);
@@ -439,7 +453,9 @@ class Interpreter implements ExprVisitor,StmtVisitor{
         return ExInt(5);
     }
 
-    if(value != null) initial.set(value,name);
+    if(value != null){ 
+      initial.set(value,name);
+    };
     
     return initial;
     
@@ -461,6 +477,9 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     if(structure is ExStruct){
       return decStructInstance(structure,name);
     }
+    if(structure is ExClass){
+      return decClassInstance(structure,name);
+    }
     throw ExError(name.line, name.column, "The variable doesn't have a valid type", 3);
   }
 
@@ -470,6 +489,14 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       fields[param.name.lexeme] = defineValue(name, param.type, null);
     }
     return ExStructInstance(dec, fields);
+  }
+
+  ExValue decClassInstance(ExClass dec, Token name){
+    Map<String,ExValue> fields = Map<String,ExValue>();
+    for(Parameter param in dec.fields){
+      fields[param.name.lexeme] = defineValue(name, param.type, null);
+    }
+    return ExClassInstance(dec);
   }
 
   ExValue createNumber(num value)
