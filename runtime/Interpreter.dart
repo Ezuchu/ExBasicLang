@@ -108,7 +108,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   @override
   visitClassStmt(ClassStmt stmt) {
     enviroment.define(stmt.name, ExVoid());
-    ExClass klass = ExClass(stmt.name.lexeme, enviroment, stmt.attributes, stmt.methods);
+    ExClass klass = ExClass(stmt.name.lexeme, enviroment, stmt.attributes, stmt.methods,stmt.constructor);
     enviroment.values[stmt.name.lexeme] = klass;
   }
 
@@ -129,7 +129,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override
   visitFunDeclaration(FunDeclaration stmt) {
-    ExFunction function = ExFunction(stmt,enviroment);
+    ExFunction function = ExFunction(stmt,enviroment,false);
     enviroment.define(stmt.name, function);
   }
 

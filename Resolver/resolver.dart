@@ -13,7 +13,13 @@ import '../runtime/Interpreter.dart';
 enum FunctionType{
   NONE,
   FUNCTION,
-  METHOD
+  METHOD,
+  CONSTRUCTOR
+}
+
+enum ClassType{
+  NONE,
+  CLASS
 }
 
 
@@ -25,6 +31,7 @@ class Resolver implements ExprVisitor,StmtVisitor
   final List<Map<String,ExSymbol>> scopes = [];
   bool onMain = false;
   FunctionType currentFunction = FunctionType.NONE;
+  ClassType currentClass = ClassType.NONE;
   TypeExpr? currentType;
 
   
@@ -112,7 +119,11 @@ class Resolver implements ExprVisitor,StmtVisitor
   @override
   visitClassStmt(ClassStmt stmt) {
     if(scopes.isNotEmpty) throw ExError(stmt.name.line, stmt.name.column, "can't declare a class in a local scope", 3);
-    TypeExpr klass = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods);
+    
+    ClassType enclosingClass = currentClass;
+    currentClass = ClassType.CLASS;
+    
+    TypeExpr klass = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods,stmt.constructor);
     declare(stmt.name, klass);
     define(stmt.name);
 
@@ -120,11 +131,17 @@ class Resolver implements ExprVisitor,StmtVisitor
 
     scopes.last["this"] = ExSymbol("this", true, ClassTypeInstance(klass as ClassTypeExpr));
 
+    if(stmt.constructor != null){
+      visitFunDeclaration(stmt.constructor!, funType:  FunctionType.CONSTRUCTOR);
+    }
+
     for(FunDeclaration method in stmt.methods){
       visitFunDeclaration(method,funType: FunctionType.METHOD);
     }
 
     endScope();
+
+    currentClass = enclosingClass;
   }
 
   @override  
@@ -174,6 +191,9 @@ class Resolver implements ExprVisitor,StmtVisitor
     TypeExpr type;
 
     if(stmt.expr!= null){ 
+      if(currentFunction == FunctionType.CONSTRUCTOR && !(stmt.expr! is ThisExpr)){
+        throw ExError(stmt.keyword.line, stmt.keyword.column, "Can't return a value from a constructor", 3);
+      }
       type = resolveExpr(stmt.expr!);
     }else{
       type = TypeExpr(ExType.VOID);
@@ -386,6 +406,9 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   @override  
   TypeExpr visitThisExpr(ThisExpr expr){
+    if(currentClass == ClassType.NONE){
+      throw ExError(expr.keyword.line, expr.keyword.column, "Can't use 'this' outside a class.", 3);
+    }
     return resolveLocal(expr, expr.keyword);
   }
 

@@ -133,8 +133,9 @@ class ClassTypeExpr extends TypeExpr{
   final String name;
   final Map<String,TypeExpr> fields = Map<String,TypeExpr>();
   final Map<String,FunctionTypeExpr> methods = Map<String,FunctionTypeExpr>();
+  FunctionTypeExpr? initializer;
 
-  ClassTypeExpr(this.name,List<Parameter> params, List<FunDeclaration> funDecs) : super(ExType.CLASS)
+  ClassTypeExpr(this.name,List<Parameter> params, List<FunDeclaration> funDecs,FunDeclaration? constructor) : super(ExType.CLASS)
   {
     for(Parameter param in params){
       fields[param.name.lexeme] = param.type;
@@ -142,6 +143,10 @@ class ClassTypeExpr extends TypeExpr{
 
     for(FunDeclaration fun in funDecs){
       methods[fun.name.lexeme] = FunctionTypeExpr(fun.name.lexeme, fun.parameters.map((e) => e.type).toList(),fun.returnType);
+    }
+
+    if(constructor != null){
+      initializer = FunctionTypeExpr(constructor.name.lexeme, constructor.parameters.map((e) => e.type).toList(), ClassTypeInstance(this));
     }
   }
 }

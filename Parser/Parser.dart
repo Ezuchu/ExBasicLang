@@ -74,24 +74,48 @@ class Parser extends ParserBase
     consume(Tokentype.LEFT_BRACE, "Expected '{' after class name");
     List<FunDeclaration> methods = [];
     List<Parameter> attributes = [];
+    FunDeclaration? constructor;
 
     while(match(types)){
-      Statement property =declarationStmt();
-      if(property is FunDeclaration){
-        methods.add(property);
-      }else if(property is VarDeclaration)
+      if(peek().type == Tokentype.LEFT_PAREN){
+        if(previous().lexeme == name.lexeme){
+          constructor = constructorStmt();
+        }else{
+          throw ExError(previous().line, previous().column,"Invalid type for constructor", 2);
+        }
+      }else
       {
-        attributes.add(Parameter(property.identifier, property.type));
-      }
+        Statement property =declarationStmt();
+        if(property is FunDeclaration){
+          methods.add(property);
+        }else if(property is VarDeclaration)
+        {
+          attributes.add(Parameter(property.identifier, property.type));
+        }
+      }  
     }
     consume(Tokentype.RIGHT_BRACE, "Expected '}' to close class declaration");
 
-    return ClassStmt(name, attributes,methods);
+    return ClassStmt(name, attributes,methods,constructor);
+  }
+
+  FunDeclaration constructorStmt(){
+    Token klass = previous();
+    TypeExpr type = IdentifierType(ExType.IDENTIFIER, klass);
+    List<Parameter> params = [];
+
+    consume(Tokentype.LEFT_PAREN, "Expected '('");
+    params = getParameters(Tokentype.RIGHT_PAREN);
+
+    consume(Tokentype.LEFT_BRACE, "Expected '{' after parameters");
+
+    Statement body = blockStatement();
+
+    return FunDeclaration(klass, params, body, type);
   }
 
   Statement doStmt()
   {
-
     Statement body = statement();
 
     consume(Tokentype.UNTIL, "Expected the condition to end the repeat loop");

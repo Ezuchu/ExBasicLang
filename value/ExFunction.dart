@@ -4,6 +4,7 @@ import '../AST/Parameter.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../Token/Token.dart';
+import '../Token/TokenType.dart';
 import '../runtime/Interpreter.dart';
 import '../runtime/Return.dart';
 import '../runtime/enviroment.dart';
@@ -17,9 +18,10 @@ class ExFunction extends ExValue implements ExCallable
 {
   final FunDeclaration declaration;
   final Enviroment closure;
+  final bool initializer;
   
 
-  ExFunction(this.declaration,this.closure)
+  ExFunction(this.declaration,this.closure,this.initializer)
   {
     type = ExType.FUNCTION;
   }
@@ -43,9 +45,11 @@ class ExFunction extends ExValue implements ExCallable
         returnValue = error.value;
       }
     }
-    
-
     interpreter.enviroment = aux;
+
+    if(initializer && returnValue is ExVoid){
+      return closure.getAt(0, Token(Tokentype.THIS,"this",null,-1,-1));
+    }
 
     return returnValue;
   }
@@ -53,7 +57,7 @@ class ExFunction extends ExValue implements ExCallable
   ExFunction bind(ExClassInstance instance){
     Enviroment env = Enviroment(this.closure);
     env.values["this"] = instance;
-    return ExFunction(this.declaration, env);
+    return ExFunction(this.declaration, env,initializer);
   }
 
   @override

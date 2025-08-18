@@ -41,8 +41,9 @@ class ClassStmt extends Statement{
   Token name;
   List<Parameter> attributes;
   List<FunDeclaration> methods;
+  FunDeclaration? constructor;
 
-  ClassStmt(this.name,this.attributes,this.methods);
+  ClassStmt(this.name,this.attributes,this.methods,this.constructor);
   
   @override
   R accept<R>(StmtVisitor visitor) {

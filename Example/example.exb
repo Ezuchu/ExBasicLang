@@ -1,0 +1,18 @@
+class calc{
+    int a;
+    int b;
+
+    calc(int z){
+        this.a = z;
+        this.b = 7;
+    }
+
+    int sum(){
+        return this.a + this.b;
+    }
+}
+
+{
+    calc inst = calc(7);
+    print inst.sum();
+}
