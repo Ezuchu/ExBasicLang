@@ -183,6 +183,33 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   }
 
   @override
+  visitSwitchStmt(SwitchStmt stmt) {
+    ExValue object = evaluate(stmt.object);
+    bool exec = false;
+    for((Literal? a ,BlockStatement b) kase in stmt.cases){
+      if(!exec){
+        if(kase.$1 == null){
+        exec = true;
+        }else{
+          ExValue value = evaluate(kase.$1!);
+          if(isTruthy(object.isEqual(value))) exec = true;
+        }
+      }
+      if(exec){
+        try {
+          visitBlockStatement(kase.$2);
+        } catch (e) {
+          if(e is Break){
+            break;
+          }else{
+            throw e;
+          }
+        }
+      }
+    }
+  }
+
+  @override
   visitVarDeclaration(VarDeclaration stmt) {
     Token identifier = stmt.identifier;
 

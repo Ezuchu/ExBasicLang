@@ -23,6 +23,7 @@ class Parser extends ParserBase
     if(match([Tokentype.WHILE])) return whileStmt();
     if(match([Tokentype.FOR])) return forStmt();
     if(match([Tokentype.DO])) return doStmt();
+    if(match([Tokentype.SWITCH])) return switchStmt();
     if(match([Tokentype.PRINT])) return printStmt();
     if(match([Tokentype.BREAK])) return breakStmt();
     if(match([Tokentype.RETURN])) return returnStmt();
@@ -267,6 +268,37 @@ class Parser extends ParserBase
     List<Parameter> params = getParameters(Tokentype.RIGHT_BRACE);
 
     return StructStmt(name, params);
+  }
+
+  Statement switchStmt(){
+    Token keyword = previous();
+    consume(Tokentype.LEFT_PAREN, "Expected '('");
+    Expression object = expression();
+    consume(Tokentype.RIGHT_PAREN, "Expected ')'");
+    consume(Tokentype.LEFT_BRACE, "Expected '{'");
+
+    List<(Literal?,BlockStatement)> cases = [];
+    while(!match([Tokentype.DEFAULT])){
+      consume(Tokentype.CASE, "Expected case statement");
+      Expression caseValue = primary();
+      if(!(caseValue is Literal)) throw ExError(previous().line, previous().column, "the case value must be a literal", 2);
+      consume(Tokentype.DOT_DOT, "Expected ':'");
+
+      List<Statement> body = [];
+      while(!check(Tokentype.CASE) && !check(Tokentype.DEFAULT)){
+        body.add(statement());
+      }
+      cases.add((caseValue,BlockStatement(body)));
+    }
+    consume(Tokentype.DOT_DOT, "Expected ':'");
+    List<Statement> defaultBody = [];
+    while(!match([Tokentype.RIGHT_BRACE])){
+      defaultBody.add(statement());
+    }
+    BlockStatement defaultStmt = BlockStatement(defaultBody);
+    cases.add((null,defaultStmt));
+
+    return SwitchStmt(keyword,object,cases,defaultStmt);
   }
 
   Statement whileStmt()

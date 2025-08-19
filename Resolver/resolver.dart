@@ -244,6 +244,26 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   }
 
+  @override
+  visitSwitchStmt(SwitchStmt stmt) {
+    TypeExpr objectType = resolveExpr(stmt.object);
+
+    CycleType enclosingType = currentCycle;
+    currentCycle = CycleType.SWITCH;
+
+    for((Literal? a,BlockStatement b) kase in stmt.cases){
+      if(kase.$1 != null){
+        TypeExpr caseType = visitLiteral(kase.$1!);
+        if(objectType != caseType){
+          throw ExError(kase.$1!.token.line, kase.$1!.token.column, "literal and switch object types are not compatible", 3);
+        }
+      }
+      visitBlockStatement(kase.$2);
+    }
+
+    currentCycle = enclosingType;
+  }
+
   @override  
   visitVarDeclaration(VarDeclaration stmt) {
     TypeExpr type = resolveType(stmt.type);
@@ -264,7 +284,6 @@ class Resolver implements ExprVisitor,StmtVisitor
     resolveExpr(stmt.condition);
     CycleType type = currentCycle;
     currentCycle = CycleType.CYCLE;
-    
     resolve(stmt.body);
     currentCycle =type;
   }

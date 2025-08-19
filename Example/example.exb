@@ -1,19 +1,13 @@
 {
-    int caja = 7;
-    while(caja < 20){
-        caja++;
-        if(caja == 15){
-            break;
-        }
+    int caja = 3;
+
+    switch(caja){
+        case 1: print 1;
+        case 2: print 2;
+        case 3: print 3;
+        case 4: print 4;break;
+
+        default:
+            print "no se";
     }
-    print caja;
-
-    do{
-        caja--;
-        if(caja == 10){
-            break;
-        }
-    }until(caja == 8);
-
-    print caja;
 }

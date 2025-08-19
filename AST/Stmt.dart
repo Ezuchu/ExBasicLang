@@ -21,6 +21,7 @@ abstract class StmtVisitor<R>
   R visitIfStatement(IfStatement stmt);
   R visitReturnStmt(ReturnStmt stmt);
   R visitStructStmr(StructStmt stmt);
+  R visitSwitchStmt(SwitchStmt stmt);
   R visitVarDeclaration(VarDeclaration stmt);
   R visitWhileStatement(WhileStatement stmt);
 }
@@ -175,6 +176,20 @@ class StructStmt extends Statement{
   @override
   R accept<R>(StmtVisitor visitor) {
     return visitor.visitStructStmr(this);
+  }
+}
+
+class SwitchStmt extends Statement{
+  final Token keyword;
+  final Expression object;
+  final List<(Literal?, BlockStatement stmt)> cases;
+  final BlockStatement defaultCase;
+
+  SwitchStmt(this.keyword,this.object,this.cases,this.defaultCase);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitSwitchStmt(this);
   }
 }
 

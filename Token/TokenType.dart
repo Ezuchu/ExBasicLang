@@ -26,6 +26,7 @@ enum Tokentype
     COMMA,
     SEMICOLON,
     DOT,
+    DOT_DOT,
 
 
 
