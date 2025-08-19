@@ -71,6 +71,10 @@ class Parser extends ParserBase
 
   Statement classStmt(){
     Token name = consume(Tokentype.IDENTIFIER, "Expected class name");
+    Variable? superClass;
+    if(match([Tokentype.EXTENDS])){
+      superClass = Variable(consume(Tokentype.IDENTIFIER, "Expected super class name"));
+    }
     consume(Tokentype.LEFT_BRACE, "Expected '{' after class name");
     List<FunDeclaration> methods = [];
     List<Parameter> attributes = [];
@@ -96,7 +100,7 @@ class Parser extends ParserBase
     }
     consume(Tokentype.RIGHT_BRACE, "Expected '}' to close class declaration");
 
-    return ClassStmt(name, attributes,methods,constructor);
+    return ClassStmt(name, attributes,methods,constructor,superClass);
   }
 
   FunDeclaration constructorStmt(){

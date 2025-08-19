@@ -122,8 +122,21 @@ class Resolver implements ExprVisitor,StmtVisitor
     
     ClassType enclosingClass = currentClass;
     currentClass = ClassType.CLASS;
+
+    ClassTypeExpr? superClass;
+
+    if(stmt.superClass != null){
+      TypeExpr type = resolveExpr(stmt.superClass!);
+      if(!(type is ClassTypeExpr)) {
+        throw ExError(stmt.superClass!.name.line, stmt.superClass!.name.column, "${stmt.superClass!.name.lexeme} is not a valid class name", 3);
+      }
+      superClass = type;
+      if(superClass.name == stmt.name.lexeme){
+        throw ExError(stmt.superClass!.name.line, stmt.superClass!.name.column,  "A class can't inherit from itself", 3);
+      }
+    }
     
-    TypeExpr klass = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods,stmt.constructor);
+    TypeExpr klass = ClassTypeExpr(stmt.name.lexeme, stmt.attributes, stmt.methods,stmt.constructor,superClass);
     declare(stmt.name, klass);
     define(stmt.name);
 
@@ -443,13 +456,10 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   TypeExpr resolveClassGet(Token name, ClassTypeExpr klass){
-    if(!klass.fields.containsKey(name.lexeme)){
-      if(!klass.methods.containsKey(name.lexeme)){
+    if(!klass.hasProperty(name.lexeme)){
         throw ExError(name.line, name.column, "The class type doesn't have that field", 3);
-      }
-      return klass.methods[name.lexeme]!;
     }
-    return klass.fields[name.lexeme]!;
+    return klass.getProperty(name.lexeme)!;
   }
 
   bool isNumber(TypeExpr type){

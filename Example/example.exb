@@ -4,7 +4,7 @@ class calc{
 
     calc(int z){
         this.a = z;
-        this.b = 7;
+        this.b = z;
     }
 
     int sum(){
@@ -12,7 +12,15 @@ class calc{
     }
 }
 
+class dev extends calc{
+    dev(int s, int q){
+        this.a = s;
+        this.b = q;
+    }
+
+}
+
 {
-    calc inst = calc(7);
+    dev inst = dev(7,8);
     print inst.sum();
 }

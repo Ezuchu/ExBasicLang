@@ -1,8 +1,10 @@
 
 import '../AST/TypeExpr.dart';
+import '../ExError.dart';
 import '../Token/Token.dart';
 import 'ExBool.dart';
 import 'ExClass.dart';
+import 'ExFunction.dart';
 import 'ExValue.dart';
 
 class ExClassInstance extends ExValue{
@@ -18,7 +20,11 @@ class ExClassInstance extends ExValue{
     if(fields.containsKey(name.lexeme)){
       return fields[name.lexeme]!;
     }
-    return klass.methods[name.lexeme]!.bind(this);
+    ExFunction? func = klass.findMethod(name.lexeme);
+    if(func != null){
+      return func.bind(this);
+    }
+    throw ExError(name.line, name.column, "bad", 3);
   }
 
   @override

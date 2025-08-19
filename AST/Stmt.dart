@@ -42,8 +42,9 @@ class ClassStmt extends Statement{
   List<Parameter> attributes;
   List<FunDeclaration> methods;
   FunDeclaration? constructor;
+  Variable? superClass;
 
-  ClassStmt(this.name,this.attributes,this.methods,this.constructor);
+  ClassStmt(this.name,this.attributes,this.methods,this.constructor,this.superClass);
   
   @override
   R accept<R>(StmtVisitor visitor) {

@@ -134,8 +134,9 @@ class ClassTypeExpr extends TypeExpr{
   final Map<String,TypeExpr> fields = Map<String,TypeExpr>();
   final Map<String,FunctionTypeExpr> methods = Map<String,FunctionTypeExpr>();
   FunctionTypeExpr? initializer;
+  ClassTypeExpr? superClass;
 
-  ClassTypeExpr(this.name,List<Parameter> params, List<FunDeclaration> funDecs,FunDeclaration? constructor) : super(ExType.CLASS)
+  ClassTypeExpr(this.name,List<Parameter> params, List<FunDeclaration> funDecs,FunDeclaration? constructor,this.superClass) : super(ExType.CLASS)
   {
     for(Parameter param in params){
       fields[param.name.lexeme] = param.type;
@@ -148,6 +149,24 @@ class ClassTypeExpr extends TypeExpr{
     if(constructor != null){
       initializer = FunctionTypeExpr(constructor.name.lexeme, constructor.parameters.map((e) => e.type).toList(), ClassTypeInstance(this));
     }
+  }
+
+  bool hasProperty(String name){
+    bool result = fields.containsKey(name) || methods.containsKey(name);
+    if(result == false && superClass != null){
+      return superClass!.hasProperty(name);
+    }
+    return result;
+  }
+
+  TypeExpr? getProperty(String name){
+    if(fields.containsKey(name)) return fields[name];
+    if(methods.containsKey(name)) return methods[name];
+
+    if(superClass != null){
+      return superClass!.getProperty(name);
+    }
+    return null;
   }
 }
 
@@ -163,4 +182,3 @@ class ClassTypeInstance extends TypeExpr{
     return false;
   }
 }
-

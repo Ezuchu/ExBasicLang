@@ -68,6 +68,7 @@ enum Tokentype
     VOID_TYPE,
 
     THIS,
+    EXTENDS,
 
     STRUCT,
     CLASS,
@@ -115,6 +116,7 @@ Map<String, Tokentype> typeMap={
   "void": Tokentype.VOID_TYPE,
 
   "this": Tokentype.THIS,
+  "extends": Tokentype.EXTENDS,
 
   "struct" : Tokentype.STRUCT,
   "class" : Tokentype.CLASS,

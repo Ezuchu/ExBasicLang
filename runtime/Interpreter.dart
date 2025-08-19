@@ -107,8 +107,13 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override
   visitClassStmt(ClassStmt stmt) {
+    ExClass? superClass;
+    if(stmt.superClass != null){
+      superClass = visitVariable(stmt.superClass!) as ExClass;
+    }
+
     enviroment.define(stmt.name, ExVoid());
-    ExClass klass = ExClass(stmt.name.lexeme, enviroment, stmt.attributes, stmt.methods,stmt.constructor);
+    ExClass klass = ExClass(stmt.name.lexeme, enviroment, stmt.attributes, stmt.methods,stmt.constructor,superClass);
     enviroment.values[stmt.name.lexeme] = klass;
   }
 
@@ -499,7 +504,15 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   ExValue decClassInstance(ExClass dec, Token name){
     Map<String,ExValue> fields = Map<String,ExValue>();
     for(Parameter param in dec.fields){
-      fields[param.name.lexeme] = defineValue(name, param.type, null);
+      fields[param.name.lexeme] = defineValue(param.name, param.type, null);
+    }
+    ExClass? superKlass = dec.superClass;
+    while(superKlass != null)
+    {
+      for(Parameter param in superKlass.fields){
+        fields[param.name.lexeme] = defineValue(param.name, param.type, null);
+      }
+      superKlass = superKlass.superClass;
     }
     return ExClassInstance(dec);
   }
