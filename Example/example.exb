@@ -1,26 +1,19 @@
-class calc{
-    int a;
-    int b;
-
-    calc(int z){
-        this.a = z;
-        this.b = z;
-    }
-
-    int sum(){
-        return this.a + this.b;
-    }
-}
-
-class dev extends calc{
-    dev(int s, int q){
-        this.a = s;
-        this.b = q;
-    }
-
-}
-
 {
-    dev inst = dev(7,8);
-    print inst.sum();
+    int caja = 7;
+    while(caja < 20){
+        caja++;
+        if(caja == 15){
+            break;
+        }
+    }
+    print caja;
+
+    do{
+        caja--;
+        if(caja == 10){
+            break;
+        }
+    }until(caja == 8);
+
+    print caja;
 }

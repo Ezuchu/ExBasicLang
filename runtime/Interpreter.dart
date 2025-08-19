@@ -24,6 +24,7 @@ import '../value/ExStruct.dart';
 import '../value/ExStructInstance.dart';
 import '../value/ExValue.dart';
 import '../value/ExVoid.dart';
+import 'Break.dart';
 import 'Return.dart';
 import 'enviroment.dart';
 
@@ -94,6 +95,11 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   }
 
   @override
+  visitBreakStmt(BreakStmt stmt) {
+    throw Break();
+  }
+
+  @override
   visitCall(Call expr) {
     ExValue callee = evaluate(expr.calee);
     List<ExValue> arguments = expr.arguments.map((arg)=> evaluate(arg)).toList();
@@ -127,7 +133,15 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     bool pass = true;
     while(pass)
     {
-      execute(stmt.body);
+      try {
+        execute(stmt.body);
+      } catch (e) {
+        if(e is Break){
+          break;
+        }else{
+          throw e;
+        }
+      }
       pass = !isTruthy(evaluate(stmt.condition));
     }
   }
@@ -182,7 +196,17 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
   @override  
   visitWhileStatement(WhileStatement stmt) {
-    while(isTruthy(evaluate(stmt.condition))) execute(stmt.body); 
+    while(isTruthy(evaluate(stmt.condition))) {
+      try {
+        execute(stmt.body);
+      } catch (e) {
+        if(e is Break){
+          break;
+        }else{
+          throw e;
+        }
+      }
+    } 
   }
 
   @override

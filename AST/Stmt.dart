@@ -12,6 +12,7 @@ abstract class StmtVisitor<R>
 {
   R visitMainStmt(MainStmt stmt);
   R visitBlockStatement(BlockStatement stmt);
+  R visitBreakStmt(BreakStmt stmt);
   R visitClassStmt(ClassStmt stmt);
   R visitDoStmt(DoStmt stmt);
   R visitFunDeclaration(FunDeclaration stmt);
@@ -35,6 +36,19 @@ class BlockStatement extends Statement
     return visitor.visitBlockStatement(this);
   }
 
+}
+
+class BreakStmt extends Statement{
+  final Token keyword;
+
+  BreakStmt(this.keyword);
+  
+  @override
+  R accept<R>(StmtVisitor visitor) {
+    return visitor.visitBreakStmt(this);
+  }
+
+  
 }
 
 class ClassStmt extends Statement{

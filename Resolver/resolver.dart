@@ -22,6 +22,12 @@ enum ClassType{
   CLASS
 }
 
+enum CycleType{
+  NONE,
+  CYCLE,
+  SWITCH,
+}
+
 
 
 class Resolver implements ExprVisitor,StmtVisitor
@@ -32,6 +38,7 @@ class Resolver implements ExprVisitor,StmtVisitor
   bool onMain = false;
   FunctionType currentFunction = FunctionType.NONE;
   ClassType currentClass = ClassType.NONE;
+  CycleType currentCycle = CycleType.NONE;
   TypeExpr? currentType;
 
   
@@ -116,6 +123,13 @@ class Resolver implements ExprVisitor,StmtVisitor
     endScope();
   }
 
+  @override  
+  visitBreakStmt(BreakStmt stmt) {
+    if(currentCycle == CycleType.NONE){
+      throw ExError(stmt.keyword.line, stmt.keyword.column, "Can't break from a non cyclic statement", 3);
+    }
+  }
+
   @override
   visitClassStmt(ClassStmt stmt) {
     if(scopes.isNotEmpty) throw ExError(stmt.name.line, stmt.name.column, "can't declare a class in a local scope", 3);
@@ -159,7 +173,11 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   @override  
   visitDoStmt(DoStmt stmt) {
+    CycleType type = currentCycle;
+    currentCycle = CycleType.CYCLE;
     resolve(stmt.body);
+
+    currentCycle = type;
     resolveExpr(stmt.condition);
   }
 
@@ -244,7 +262,11 @@ class Resolver implements ExprVisitor,StmtVisitor
   @override  
   visitWhileStatement(WhileStatement stmt) {
     resolveExpr(stmt.condition);
+    CycleType type = currentCycle;
+    currentCycle = CycleType.CYCLE;
+    
     resolve(stmt.body);
+    currentCycle =type;
   }
 
 

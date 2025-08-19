@@ -9,7 +9,11 @@ enum Tokentype
     FOR,
     DO,
     UNTIL,
+    SWITCH,
+    CASE,
+    DEFAULT,
 
+    BREAK,
     RETURN,
 
 
@@ -101,7 +105,11 @@ Map<String, Tokentype> typeMap={
   "for" :Tokentype.FOR,
   "do" : Tokentype.DO,
   "until" : Tokentype.UNTIL,
+  "switch" : Tokentype.SWITCH,
+  "case" : Tokentype.CASE,
+  "default" : Tokentype.DEFAULT,
 
+  "break" : Tokentype.BREAK,
   "return" : Tokentype.RETURN,
 
   "TRUE": Tokentype.TRUE,

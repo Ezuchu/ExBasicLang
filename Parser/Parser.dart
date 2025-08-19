@@ -24,6 +24,7 @@ class Parser extends ParserBase
     if(match([Tokentype.FOR])) return forStmt();
     if(match([Tokentype.DO])) return doStmt();
     if(match([Tokentype.PRINT])) return printStmt();
+    if(match([Tokentype.BREAK])) return breakStmt();
     if(match([Tokentype.RETURN])) return returnStmt();
     if(match([Tokentype.STRUCT])) return structStmt();
     if(match([Tokentype.CLASS])) return classStmt();
@@ -67,6 +68,12 @@ class Parser extends ParserBase
     addStatementsTo(statements);
 
     return BlockStatement(statements);
+  }
+
+  Statement breakStmt(){
+    Token keyword = previous();
+    consume(Tokentype.SEMICOLON, "Expected ';' after keyword");
+    return BreakStmt(keyword);
   }
 
   Statement classStmt(){
