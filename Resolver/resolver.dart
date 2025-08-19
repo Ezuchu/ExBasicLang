@@ -97,7 +97,7 @@ class Resolver implements ExprVisitor,StmtVisitor
   }
 
   void resolveFunction(FunDeclaration fun,FunctionType type){
-    Map<String,ExSymbol> scope = scopes.isEmpty? global : scopes.last;
+    
 
     FunctionType enclosingFunction = currentFunction;
     TypeExpr? enclosingType = currentType;
@@ -380,6 +380,7 @@ class Resolver implements ExprVisitor,StmtVisitor
             throw ExError(expr.paren.line, expr.paren.column, "a parameter is incompatible with the function parameter", 3); 
           }
         }
+        index++;
       }
       return calleType.returnType;
     }
@@ -452,6 +453,10 @@ class Resolver implements ExprVisitor,StmtVisitor
           throw ExError(expr.operand.line,expr.operand.column,"operand is not a number value",3);
         };break;
       case Tokentype.BANG: return TypeExpr(ExType.BOOL);
+      case Tokentype.AMPERSAND: return PointerTypeExpr(type);
+      case Tokentype.STAR : if(!(type is PointerTypeExpr)){
+          throw ExError(expr.operand.line,expr.operand.column,"operand is not a pointer value",3);
+        }return type.pointingType;
       default:
     }
 
@@ -476,6 +481,7 @@ class Resolver implements ExprVisitor,StmtVisitor
 
   TypeExpr resolveType(TypeExpr originType){
     if(primitives.contains(originType.type)) return originType;
+    if(originType is PointerTypeExpr) return PointerTypeExpr(resolveType(originType.pointingType));
     if(originType is ArrayType){
       return ArrayType(resolveType(originType.itemType), originType.dimensionExpr, originType.literalDim);
     }

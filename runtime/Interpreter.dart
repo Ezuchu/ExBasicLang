@@ -19,6 +19,7 @@ import '../value/ExClassInstance.dart';
 import '../value/ExDouble.dart';
 import '../value/ExFunction.dart';
 import '../value/ExInt.dart';
+import '../value/ExPointer.dart';
 import '../value/ExString.dart';
 import '../value/ExStruct.dart';
 import '../value/ExStructInstance.dart';
@@ -102,13 +103,12 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   @override
   visitCall(Call expr) {
     ExValue callee = evaluate(expr.calee);
-    List<ExValue> arguments = expr.arguments.map((arg)=> evaluate(arg)).toList();
+    List<ExValue> arguments = expr.arguments.map((arg)=> evaluate(arg).copy()).toList();
 
     if(!(callee is ExCallable)) throw ExError(expr.paren.line, expr.paren.column, "The expression is not a valid callable", 3);
 
-    ExCallable function = callee as ExCallable;
 
-    return function.call(this, arguments);
+    return callee.call(this, arguments);
   }
 
   @override
@@ -452,6 +452,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
     ExValue right = evaluate(expr.expr);
     Token operator = expr.operand;
 
+
     switch(expr.operand.type)
     {
       case Tokentype.BANG: return ExBool(!right.getValue());
@@ -463,6 +464,13 @@ class Interpreter implements ExprVisitor,StmtVisitor{
         {
           throw ExError(operator.line, operator.column, 'The negative value is not a number', 3);
         }
+      
+      case Tokentype.AMPERSAND: return ExPointer(right.type, null, right);
+
+      case Tokentype.STAR: if(!(right is ExPointer)){
+        throw ExError(expr.operand.line, expr.operand.column, "The value is not a pointer", 3);
+      };return right.getValue();
+
       default:
         throw ExError(operator.line, operator.column, '${operator.lexeme} is not a valid unary operator', 3);
     }
@@ -499,7 +507,6 @@ class Interpreter implements ExprVisitor,StmtVisitor{
   ExValue defineValue(Token name, TypeExpr type, ExValue? value)
   {
     ExValue initial;
-    
 
     switch(type.type)
     {
@@ -510,6 +517,7 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       case ExType.STRING : initial = ExString();break;
       case ExType.ARRAY : initial = decArray(type as ArrayType, name);break;
       case ExType.IDENTIFIER : initial = decInstance(type as IdentifierType,name);break;
+      case ExType.POINTER: initial = decPointer(type as PointerTypeExpr,name);break;
       default:
         return ExInt(5);
     }
@@ -529,7 +537,6 @@ class Interpreter implements ExprVisitor,StmtVisitor{
 
     List <ExValue> items = List<ExValue>.generate(dimension.getValue(), (int index) => defineValue(name,type.itemType,null));
 
-
     return ExArray(items, type.itemType.type, dimension.getValue());
   }
 
@@ -542,6 +549,10 @@ class Interpreter implements ExprVisitor,StmtVisitor{
       return decClassInstance(structure,name);
     }
     throw ExError(name.line, name.column, "The variable doesn't have a valid type", 3);
+  }
+
+  ExValue decPointer(PointerTypeExpr type ,Token name){
+    return ExPointer(type.pointingType.type, null, null);
   }
 
   ExValue decStructInstance(ExStruct dec, Token name){

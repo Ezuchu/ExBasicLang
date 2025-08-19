@@ -27,6 +27,7 @@ enum Tokentype
     SEMICOLON,
     DOT,
     DOT_DOT,
+    AMPERSAND,
 
 
 

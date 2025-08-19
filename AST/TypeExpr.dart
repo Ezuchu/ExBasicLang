@@ -18,6 +18,8 @@ enum ExType
   FUNCTION,
   ANY,
 
+  POINTER,
+
   STRUCT,
   STRUCT_INSTANCE,
 
@@ -99,6 +101,18 @@ class ArrayType extends TypeExpr
     return true;
   }
 
+}
+
+class PointerTypeExpr extends TypeExpr{
+  final TypeExpr pointingType;
+
+  PointerTypeExpr(this.pointingType) : super(ExType.POINTER);
+
+  @override
+  bool operator ==(Object other) {
+    if(other is PointerTypeExpr) return pointingType == other.pointingType;
+    return false;
+  }
 }
 
 class FunctionTypeExpr extends TypeExpr{

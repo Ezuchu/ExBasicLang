@@ -1,13 +1,16 @@
+int sum(int* a,int b){
+    (*a)++;
+    return *a + 7;
+}
+
+
 {
     int caja = 3;
+    int* puntero = &caja;
 
-    switch(caja){
-        case 1: print 1;
-        case 2: print 2;
-        case 3: print 3;
-        case 4: print 4;break;
+    (*puntero)++;
+    print caja;
 
-        default:
-            print "no se";
-    }
+    print sum(puntero,2);
+    print caja;
 }

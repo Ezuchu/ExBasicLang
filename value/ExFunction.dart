@@ -1,6 +1,4 @@
 
-
-import '../AST/Parameter.dart';
 import '../AST/Stmt.dart';
 import '../AST/TypeExpr.dart';
 import '../Token/Token.dart';
@@ -29,7 +27,7 @@ class ExFunction extends ExValue implements ExCallable
   @override
   ExValue call(Interpreter interpreter, List<ExValue> arguments) {
     Enviroment enviroment = Enviroment(closure);
-    declaration.parameters.forEach((p) => enviroment.define(p.name, arguments[declaration.parameters.indexOf(p)].copy()));
+    declaration.parameters.forEach((p) => enviroment.define(p.name, arguments[declaration.parameters.indexOf(p)]));
 
     Enviroment aux = interpreter.enviroment;
     interpreter.enviroment = enviroment;

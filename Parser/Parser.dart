@@ -34,9 +34,8 @@ class Parser extends ParserBase
 
     if(match(types))
     {
-      if(match([Tokentype.IDENTIFIER,Tokentype.LESS]))
+      if(check(Tokentype.IDENTIFIER) || check(Tokentype.LESS) || check(Tokentype.STAR))
       {
-        current--;
         return declarationStmt();
       }else
       {
@@ -330,11 +329,8 @@ class Parser extends ParserBase
       Token reference = previous();
       Expression value = or();
 
-      if(expr is Variable || expr is Index || expr is GetExpr)
-      {
-        return Assignment(expr,value,reference);
-      }
-      throw ExError(reference.line, reference.column, 'assignment target is not a variable name.', 2);
+      return Assignment(expr,value,reference);
+
     }
     return expr;
   }
@@ -424,7 +420,7 @@ class Parser extends ParserBase
 
   Expression unary()
   {
-    if(match([Tokentype.BANG,Tokentype.MINUS]))
+    if(match([Tokentype.BANG,Tokentype.MINUS,Tokentype.STAR,Tokentype.AMPERSAND]))
     {
       Token operator = previous();
       Expression right = unary();
@@ -585,13 +581,18 @@ class Parser extends ParserBase
 
   TypeExpr typeExpression(ExType type)
   {
+    TypeExpr finaltype;
     switch(type)
     {
-      case ExType.ARRAY:return arrayTypeExpression();
-      case ExType.IDENTIFIER : return IdentifierType(type, previous());
+      case ExType.ARRAY:finaltype = arrayTypeExpression();break;
+      case ExType.IDENTIFIER : finaltype = IdentifierType(type, previous());break;
       default:
-        return TypeExpr(type);
+        finaltype = TypeExpr(type);
     }
+    while(match([Tokentype.STAR])){
+      finaltype = PointerTypeExpr(finaltype);
+    }
+    return finaltype;
   }
 
   TypeExpr arrayTypeExpression()
